@@ -4,8 +4,9 @@ from torch import nn
 from torch.nn import functional as F
 from .types_ import *
 
+TAU = 1.
 
-class VanillaVAE(BaseVAE):
+class VNDAE(BaseVAE):
 
 
     def __init__(self,
@@ -13,7 +14,7 @@ class VanillaVAE(BaseVAE):
                  latent_dim: int,
                  hidden_dims: List = None,
                  **kwargs) -> None:
-        super(VanillaVAE, self).__init__()
+        super(VNDAE, self).__init__()
 
         self.latent_dim = latent_dim
 
@@ -35,7 +36,7 @@ class VanillaVAE(BaseVAE):
         self.encoder = nn.Sequential(*modules)
         self.fc_mu = nn.Linear(hidden_dims[-1]*4, latent_dim)
         self.fc_var = nn.Linear(hidden_dims[-1]*4, latent_dim)
-
+        self.fc_p_vnd = nn.Linear(hidden_dims[-1]*4, latent_dim)
 
         # Build Decoder
         modules = []
@@ -88,8 +89,9 @@ class VanillaVAE(BaseVAE):
         # of the latent Gaussian distribution
         mu = self.fc_mu(result)
         log_var = self.fc_var(result)
+        p_vnd = self.fc_p_vnd(result)
 
-        return [mu, log_var]
+        return [mu, log_var, p_vnd]
 
     def decode(self, z: Tensor) -> Tensor:
         """
@@ -104,7 +106,7 @@ class VanillaVAE(BaseVAE):
         result = self.final_layer(result)
         return result
 
-    def reparameterize(self, mu: Tensor, logvar: Tensor) -> Tensor:
+    def reparameterize(self, mu: Tensor, logvar: Tensor, p_vnd: Tensor) -> Tensor:
         """
         Reparameterization trick to sample from N(mu, var) from
         N(0,1).
@@ -114,13 +116,12 @@ class VanillaVAE(BaseVAE):
         """
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        return eps * std + mu
+        s_vnd = F.gumbel_softmax(p_vnd, tau=TAU, hard=True)
+        return (eps * std + mu) * s_vnd
 
     def forward(self, input: Tensor, **kwargs) -> List[Tensor]:
         mu, log_var = self.encode(input)
         z = self.reparameterize(mu, log_var)
-        print(z.shape)
-        exit()
         return  [self.decode(z), input, mu, log_var]
 
     def loss_function(self,
