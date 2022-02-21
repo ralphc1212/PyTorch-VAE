@@ -130,7 +130,7 @@ class VanillaVAE(BaseVAE):
         :param args:
         :param kwargs:
         :return:
-        """
+        """ 
         recons = args[0]
         input = args[1]
         mu = args[2]
