@@ -201,7 +201,7 @@ class VNDAE(BaseVAE):
         z = torch.randn(num_samples,
                         self.latent_dim)
 
-        z = torch.cat([z[:, :int(SAMPLE_LEN * self.latent_dim)], torch.zeros_like(z[:, int((1 - SAMPLE_LEN) * self.latent_dim)])], dim = -1)
+        z = torch.cat([z[:, :int(SAMPLE_LEN * self.latent_dim)], torch.zeros_like(z[:, :int((1 - SAMPLE_LEN) * self.latent_dim)])], dim = -1)
         z = z.to(current_device)
 
         samples = self.decode(z)
