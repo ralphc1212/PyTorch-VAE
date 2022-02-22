@@ -169,7 +169,7 @@ class VNDAE(BaseVAE):
         ONES = torch.ones_like(beta[:,0:1])
         qv = torch.cat([ONES, torch.cumprod(beta, dim=1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
 
-        ZEROS = torch.zero_like(beta[:, 0:1])
+        ZEROS = torch.zeros_like(beta[:, 0:1])
         cum_sum = torch.cat([ZEROS, torch.cumsum(qv[:, 1:], dim = 1)], dim = -1)[:, :-1]
         coef1 = torch.sum(qv)[:, 1:] - cum_sum
         coef1 = torch.cat([torch.ones_like(p_vnd[:,:RSV_DIM]), coef1], dim = -1)
