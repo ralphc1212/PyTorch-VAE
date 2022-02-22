@@ -137,7 +137,7 @@ class VNDAE(BaseVAE):
         qv = torch.cat([ONES, torch.cumprod(beta, dim=1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
         s_vnd = F.gumbel_softmax(qv, tau=TAU, hard=True)
 
-        cumsum = torch.cumsum(sample, dim=1)
+        cumsum = torch.cumsum(s_vnd, dim=1)
         dif = cumsum - s_vnd
         mask0 = dif[:, 1:]
         mask1 = 1. - mask0
