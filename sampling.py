@@ -61,6 +61,4 @@ Path(f"{tb_logger.log_dir}/Reconstructions").mkdir(exist_ok=True, parents=True)
 # print(f"======= Training {config['model_params']['name']} =======")
 # runner.fit(experiment, datamodule=data)
 
-print(f"{tb_logger.log_dir}/")
-exit()
-runner.fit(experiment, ckpt_path=f"{tb_logger.log_dir}/", datamodule=data)
+runner.validate(experiment, ckpt_path='~/projects/PyTorch-VAE/logs/VNDAE/version_10/checkpoints/last.ckpt', datamodule=data)
