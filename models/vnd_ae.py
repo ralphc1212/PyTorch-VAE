@@ -171,7 +171,7 @@ class VNDAE(BaseVAE):
 
         ZEROS = torch.zeros_like(beta[:, 0:1])
         cum_sum = torch.cat([ZEROS, torch.cumsum(qv[:, 1:], dim = 1)], dim = -1)[:, :-1]
-        coef1 = torch.sum(qv)[:, 1:] - cum_sum
+        coef1 = torch.sum(qv, dim=1)[:, 1:] - cum_sum
         coef1 = torch.cat([torch.ones_like(p_vnd[:,:RSV_DIM]), coef1], dim = -1)
 
         kld_weight = kwargs['M_N'] # Account for the minibatch samples from the dataset
