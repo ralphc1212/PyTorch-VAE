@@ -5,6 +5,10 @@ from torch.nn import functional as F
 from .types_ import *
 
 TAU = 1.
+PI = 0.95
+RSV_DIM = 1
+EPS = 1e-8
+SAMPLE_LEN = 0.75
 
 class VNDAE(BaseVAE):
 
@@ -34,9 +38,16 @@ class VNDAE(BaseVAE):
             in_channels = h_dim
 
         self.encoder = nn.Sequential(*modules)
-        self.fc_mu = nn.Linear(hidden_dims[-1]*4, latent_dim)
-        self.fc_var = nn.Linear(hidden_dims[-1]*4, latent_dim)
-        self.fc_p_vnd = nn.Linear(hidden_dims[-1]*4, latent_dim)
+        self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
+        self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
+        self.fc_p_vnd = nn.Linear(hidden_dims[-1] * 4, latent_dim)
+
+        Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
+
+        self.ZERO = nn.Parameter(torch.tensor([0.]), requires_grad=False)
+        self.ONE = nn.Parameter(torch.tensor([1.]), requires_grad=False)
+        self.pv = nn.Parameter(torch.cat([self.ONE, torch.cumprod(Pi, dim=0)])
+                       * torch.cat([1 - Pi, self.ONE]), requires_grad=False)
 
         # Build Decoder
         modules = []
@@ -58,8 +69,6 @@ class VNDAE(BaseVAE):
                     nn.LeakyReLU())
             )
 
-
-
         self.decoder = nn.Sequential(*modules)
 
         self.final_layer = nn.Sequential(
@@ -74,6 +83,13 @@ class VNDAE(BaseVAE):
                             nn.Conv2d(hidden_dims[-1], out_channels= 3,
                                       kernel_size= 3, padding= 1),
                             nn.Tanh())
+
+    @staticmethod
+    def clip_beta(tensor, to=5.):
+        """
+        Shrink all tensor's values to range [-to,to]
+        """
+        return torch.clamp(tensor, -to, to)
 
     def encode(self, input: Tensor) -> List[Tensor]:
         """
@@ -116,13 +132,22 @@ class VNDAE(BaseVAE):
         """
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        s_vnd = F.gumbel_softmax(p_vnd, tau=TAU, hard=True)
+        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
+        qv = torch.cat([self.ONE, torch.cumprod(beta, dim=1)]) * torch.cat([1 - beta, self.ONE])
+        s_vnd = F.gumbel_softmax(qv, tau=TAU, hard=True)
+
+        cumsum = torch.cumsum(sample, dim=1)
+        dif = cumsum - s_vnd
+        mask0 = dif[:, 1:]
+        mask1 = 1. - mask0
+        s_vnd = torch.cat([torch.ones_like(p_vnd[:,:RSV_DIM]), mask1], dim = -1)
+
         return (eps * std + mu) * s_vnd
 
     def forward(self, input: Tensor, **kwargs) -> List[Tensor]:
-        mu, log_var = self.encode(input)
-        z = self.reparameterize(mu, log_var)
-        return  [self.decode(z), input, mu, log_var]
+        mu, log_var, p_vnd = self.encode(input)
+        z = self.reparameterize(mu, log_var, p_vnd)
+        return  [self.decode(z), input, mu, log_var, p_vnd]
 
     def loss_function(self,
                       *args,
@@ -133,20 +158,31 @@ class VNDAE(BaseVAE):
         :param args:
         :param kwargs:
         :return:
-        """ 
+        """
         recons = args[0]
         input = args[1]
         mu = args[2]
         log_var = args[3]
+        p_vnd = args[4]
+        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
+        qv = torch.cat([self.ONE, torch.cumprod(beta, dim=1)]) * torch.cat([1 - beta, self.ONE])
+
+        cum_sum = torch.cat([self.ZERO, torch.cumsum(qv[:, 1:], dim = 1)])[:, :-1]
+        coef1 = torch.sum(qv)[:, 1:] - cum_sum
+        coef1 = torch.cat([torch.ones_like(p_vnd[:,:RSV_DIM]), coef1], dim = -1)
 
         kld_weight = kwargs['M_N'] # Account for the minibatch samples from the dataset
         recons_loss =F.mse_loss(recons, input)
 
+        kld_gaussian = torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = 1), dim = 0)
+        kld_weighted_gaussian = torch.diagonal(kld_gaussian.mm(coef1.t()), 0).mean()
 
-        kld_loss = torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = 1), dim = 0)
+        log_frac = torch.log(qv / self.pv + EPS)
+        kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0).mean()
 
+        kld_loss = kld_vnd + kld_weighted_gaussian
         loss = recons_loss + kld_weight * kld_loss
-        return {'loss': loss, 'Reconstruction_Loss':recons_loss.detach(), 'KLD':-kld_loss.detach()}
+        return {'loss': loss, 'Reconstruction_Loss':recons_loss.detach(), 'KLD': - kld_loss.detach()}
 
     def sample(self,
                num_samples:int,
@@ -161,6 +197,7 @@ class VNDAE(BaseVAE):
         z = torch.randn(num_samples,
                         self.latent_dim)
 
+        z = torch.cat([z[:, :int(SAMPLE_LEN * self.latent_dim)], torch.zeros_like(z[:, int((1 - SAMPLE_LEN) * self.latent_dim)])], dim = -1)
         z = z.to(current_device)
 
         samples = self.decode(z)
