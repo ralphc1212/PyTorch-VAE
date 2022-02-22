@@ -177,11 +177,12 @@ class VNDAE(BaseVAE):
         kld_weight = kwargs['M_N'] # Account for the minibatch samples from the dataset
         recons_loss =F.mse_loss(recons, input)
 
-        kld_gaussian = torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = 1), dim = 0)
+        kld_gaussian = -0.5 * (1 + log_var - mu ** 2 - log_var.exp())
         print(kld_gaussian.shape)
         print(coef1.shape)
         kld_weighted_gaussian = torch.diagonal(kld_gaussian.mm(coef1.t()), 0).mean()
 
+        exit()
         log_frac = torch.log(qv / self.pv + EPS)
         kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0).mean()
 
