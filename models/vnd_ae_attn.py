@@ -96,9 +96,6 @@ class VNDAE_ATTN(BaseVAE):
             in_channels = h_dim
 
         self.encoder = nn.Sequential(*modules)
-        self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
-        self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
-        self.fc_p_vnd = nn.Linear(hidden_dims[-1] * 4, latent_dim)
 
         self.msa = MultiheadAttention(input_dim=4, embed_dim=3, num_heads=3)
 
