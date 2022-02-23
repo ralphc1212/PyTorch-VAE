@@ -3,7 +3,7 @@ from models import BaseVAE
 from torch import nn
 from torch.nn import functional as F
 from .types_ import *
-
+import math
 
 def scaled_dot_product(q, k, v, mask=None):
     d_k = q.size()[-1]
