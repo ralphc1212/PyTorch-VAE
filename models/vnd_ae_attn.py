@@ -169,7 +169,9 @@ class VNDAE_ATTN(BaseVAE):
         mu = output[:,:,1]
         log_var = output[:,:,2]
         p_vnd = torch.diagonal(attention[:,2,:,:], 0, 1, 2)
-
+        print(mu.shape)
+        exit()
+        
         return [mu, log_var, p_vnd]
 
     def decode(self, z: Tensor) -> Tensor:
