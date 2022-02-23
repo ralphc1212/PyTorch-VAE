@@ -24,8 +24,8 @@ class VNDAE(BaseVAE):
 
         modules = []
         if hidden_dims is None:
-            hidden_dims = [32, 64, 128, 256]
-            # hidden_dims = [32, 64, 128, 256, 512]
+            # hidden_dims = [32, 64, 128, 256]
+            hidden_dims = [32, 64, 128, 256, 512]
 
         # Build Encoder
         for h_dim in hidden_dims:
@@ -100,8 +100,6 @@ class VNDAE(BaseVAE):
         :return: (Tensor) List of latent codes
         """
         result = self.encoder(input)
-        print(result.shape)
-        exit()
         result = torch.flatten(result, start_dim=1)
 
         # Split the result into mu and var components
