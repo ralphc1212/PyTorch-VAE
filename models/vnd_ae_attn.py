@@ -71,7 +71,6 @@ SAMPLE_LEN = 1.
 
 class VNDAE_ATTN(BaseVAE):
 
-
     def __init__(self,
                  in_channels: int,
                  latent_dim: int,
@@ -84,6 +83,7 @@ class VNDAE_ATTN(BaseVAE):
         modules = []
         if hidden_dims is None:
             hidden_dims = [32, 64, 128, 256, 512]
+            # hidden_dims = [32, 64, 128, 256, 512]
 
         # Build Encoder
         for h_dim in hidden_dims:
@@ -101,7 +101,7 @@ class VNDAE_ATTN(BaseVAE):
         self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
         self.fc_p_vnd = nn.Linear(hidden_dims[-1] * 4, latent_dim)
 
-        # self.msa = MultiheadAttention()
+        self.msa = MultiheadAttention()
 
         Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
 
@@ -160,7 +160,8 @@ class VNDAE_ATTN(BaseVAE):
         :return: (Tensor) List of latent codes
         """
         result = self.encoder(input)
-        result = torch.flatten(result, start_dim=1)
+        # result = torch.flatten(result, start_dim=1)
+        result = result.view(*result.shape[:2],-1)
 
         # Split the result into mu and var components
         # of the latent Gaussian distribution

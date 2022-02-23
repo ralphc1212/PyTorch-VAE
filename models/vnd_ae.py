@@ -24,7 +24,8 @@ class VNDAE(BaseVAE):
 
         modules = []
         if hidden_dims is None:
-            hidden_dims = [32, 64, 128, 256, 512]
+            hidden_dims = [32, 64, 128, 256]
+            # hidden_dims = [32, 64, 128, 256, 512]
 
         # Build Encoder
         for h_dim in hidden_dims:
@@ -99,16 +100,16 @@ class VNDAE(BaseVAE):
         :return: (Tensor) List of latent codes
         """
         result = self.encoder(input)
-        # result = torch.flatten(result, start_dim=1)
+        print(result.shape)
+        exit()
+        result = torch.flatten(result, start_dim=1)
 
         # Split the result into mu and var components
         # of the latent Gaussian distribution
-        # mu = self.fc_mu(result)
-        # log_var = self.fc_var(result)
-        # p_vnd = self.fc_p_vnd(result)
+        mu = self.fc_mu(result)
+        log_var = self.fc_var(result)
+        p_vnd = self.fc_p_vnd(result)
 
-        result = result.view(*result.shape[:2],-1)
-        print(result.shape)
         return [mu, log_var, p_vnd]
 
     def decode(self, z: Tensor) -> Tensor:
