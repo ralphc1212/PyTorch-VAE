@@ -100,7 +100,7 @@ class VNDAE_ATTN(BaseVAE):
         self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
         self.fc_p_vnd = nn.Linear(hidden_dims[-1] * 4, latent_dim)
 
-        self.msa = MultiheadAttention(input_dim=4, embed_dim=1, num_heads=3)
+        self.msa = MultiheadAttention(input_dim=4, embed_dim=3, num_heads=3)
 
         Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
 
