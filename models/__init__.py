@@ -23,6 +23,7 @@ from .betatc_vae import *
 from .dip_vae import *
 from .vnd_ae import *
 from .vnd_ae import *
+from .vnd_ae_attn import *
 
 # Aliases
 VAE = VanillaVAE
