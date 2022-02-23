@@ -108,7 +108,7 @@ class VNDAE(BaseVAE):
         # p_vnd = self.fc_p_vnd(result)
 
         result = result.view(*result.shape[:2],-1)
-        
+        print(result.shape)
         return [mu, log_var, p_vnd]
 
     def decode(self, z: Tensor) -> Tensor:
