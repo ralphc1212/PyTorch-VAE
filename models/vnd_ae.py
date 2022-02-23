@@ -99,7 +99,7 @@ class VNDAE(BaseVAE):
         :return: (Tensor) List of latent codes
         """
         result = self.encoder(input)
-        print(results.shape)
+        print(result.shape)
         exit()
         result = torch.flatten(result, start_dim=1)
 
