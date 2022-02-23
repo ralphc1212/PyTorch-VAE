@@ -99,16 +99,16 @@ class VNDAE(BaseVAE):
         :return: (Tensor) List of latent codes
         """
         result = self.encoder(input)
-        print(result.shape)
-        exit()
-        result = torch.flatten(result, start_dim=1)
+        # result = torch.flatten(result, start_dim=1)
 
         # Split the result into mu and var components
         # of the latent Gaussian distribution
-        mu = self.fc_mu(result)
-        log_var = self.fc_var(result)
-        p_vnd = self.fc_p_vnd(result)
+        # mu = self.fc_mu(result)
+        # log_var = self.fc_var(result)
+        # p_vnd = self.fc_p_vnd(result)
 
+        result = result.view(*result.shape[:2],-1)
+        
         return [mu, log_var, p_vnd]
 
     def decode(self, z: Tensor) -> Tensor:
