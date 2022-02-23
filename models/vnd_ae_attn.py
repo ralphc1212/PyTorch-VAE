@@ -180,6 +180,8 @@ class VNDAE_ATTN(BaseVAE):
         :return: (Tensor) [B x C x H x W]
         """
         print(z.shape)
+        print(self.decoder_input.weight.shape)
+        exit()
         result = self.decoder_input(z)
         result = result.view(-1, 512, 2, 2)
         result = self.decoder(result)
