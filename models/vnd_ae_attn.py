@@ -65,7 +65,7 @@ class MultiheadAttention(nn.Module):
 
 TAU = 1.
 PI = 0.95
-RSV_DIM = 1
+RSV_DIM = 4
 EPS = 1e-8
 SAMPLE_LEN = 1.
 
@@ -166,13 +166,12 @@ class VNDAE_ATTN(BaseVAE):
         print(output.shape)
         print(attention.shape)
         exit()
+
         # Split the result into mu and var components
         # of the latent Gaussian distribution
-        # mu = self.fc_mu(result)
-        # log_var = self.fc_var(result)
-        # p_vnd = self.fc_p_vnd(result)
-
-
+        mu = output[:,:,1]
+        log_var = output[:,:,2]
+        p_vnd = torch.diagnal(attention(:,3,:,:), 0, 2, 3)
 
         return [mu, log_var, p_vnd]
 
@@ -199,7 +198,7 @@ class VNDAE_ATTN(BaseVAE):
         """
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
+        beta = p_vnd[:,RSV_DIM:]
         ONES = torch.ones_like(beta[:,0:1])
         qv = torch.cat([ONES, torch.cumprod(beta, dim=1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
         s_vnd = F.gumbel_softmax(qv, tau=TAU, hard=True)
@@ -232,7 +231,7 @@ class VNDAE_ATTN(BaseVAE):
         mu = args[2]
         log_var = args[3]
         p_vnd = args[4]
-        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
+        beta = p_vnd[:,RSV_DIM:]
         ONES = torch.ones_like(beta[:,0:1])
         qv = torch.cat([ONES, torch.cumprod(beta, dim=1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
 
