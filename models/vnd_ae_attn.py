@@ -166,6 +166,7 @@ class VNDAE_ATTN(BaseVAE):
         log_var = self.fc_var(result_1)
         _, attention = self.msa(result_2, return_attention=True)
 
+        print(mu.shape)
         print(attention.shape)
         exit()
         # Split the result into mu and var components
