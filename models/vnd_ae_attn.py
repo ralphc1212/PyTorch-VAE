@@ -166,6 +166,8 @@ class VNDAE_ATTN(BaseVAE):
         log_var = self.fc_var(result_1)
         _, attention = self.msa(result_2, return_attention=True)
 
+        print(attention.shape)
+        exit()
         # Split the result into mu and var components
         # of the latent Gaussian distribution
         p_vnd = torch.diagonal(attention, 0, 2, 3)
