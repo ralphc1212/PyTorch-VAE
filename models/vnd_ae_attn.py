@@ -67,7 +67,7 @@ TAU = 1.
 PI = 0.95
 RSV_DIM = 4
 EPS = 1e-8
-SAMPLE_LEN = 0.5
+SAMPLE_LEN = 0.75
 
 class VNDAE_ATTN(BaseVAE):
 
