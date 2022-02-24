@@ -29,7 +29,6 @@ class MultiheadAttention(nn.Module):
         # Stack all weight matrices 1...h together for efficiency
         # Note that in many implementations you see "bias=False" which is optional
         self.qkv_proj = nn.Linear(input_dim, 2 * embed_dim)
-        self.o_proj = nn.Linear(embed_dim, embed_dim)
 
         self._reset_parameters()
 
