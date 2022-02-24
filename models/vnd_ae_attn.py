@@ -45,7 +45,7 @@ class MultiheadAttention(nn.Module):
         qkv = self.qkv_proj(x)
 
         # Separate Q, K, V from linear output
-        qkv = qkv.reshape(batch_size, seq_length, self.num_heads, 3 * self.head_dim)
+        qkv = qkv.reshape(batch_size, seq_length, self.num_heads, 2 * self.head_dim)
         qkv = qkv.permute(0, 2, 1, 3) # [Batch, Head, SeqLen, Dims]
         q, k = qkv.chunk(2, dim=-1)
 
