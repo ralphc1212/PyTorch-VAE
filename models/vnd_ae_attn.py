@@ -97,7 +97,9 @@ class VNDAE_ATTN(BaseVAE):
 
         self.encoder = nn.Sequential(*modules)
 
-        self.msa = MultiheadAttention(input_dim=4, embed_dim=3, num_heads=3)
+        self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
+        self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
+        self.msa = MultiheadAttention(input_dim=4, embed_dim=1, num_heads=1)
 
         Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
 
@@ -159,13 +161,13 @@ class VNDAE_ATTN(BaseVAE):
         # result = torch.flatten(result, start_dim=1)
         result = result.view(*result.shape[:2],-1)
 
-        output, attention = self.msa(result, return_attention=True)
+        mu = self.fc_mu(result)
+        log_var = self.fc_var(result)
+        _, attention = self.msa(result, return_attention=True)
 
         # Split the result into mu and var components
         # of the latent Gaussian distribution
-        mu = output[:,:,1]
-        log_var = output[:,:,2]
-        p_vnd = torch.diagonal(attention[:,2,:,:], 0, 1, 2)
+        p_vnd = torch.diagonal(attention, 0, 2, 3)
 
         return [mu, log_var, p_vnd]
 
