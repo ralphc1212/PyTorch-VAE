@@ -5,7 +5,7 @@ from torch.nn import functional as F
 from .types_ import *
 import math
 
-def scaled_dot_product(q, k, v, mask=None):
+def scaled_dot_product(q, k, mask=None):
     d_k = q.size()[-1]
     attn_logits = torch.matmul(q, k.transpose(-2, -1))
     attn_logits = attn_logits / math.sqrt(d_k)
@@ -14,8 +14,7 @@ def scaled_dot_product(q, k, v, mask=None):
         attn_logits = attn_logits.masked_fill(mask == 0, -9e15)
 
     attention = F.softmax(attn_logits, dim=-1)
-    values = torch.matmul(attention, v)
-    return values, attention
+    return attention
 
 class MultiheadAttention(nn.Module):
 
@@ -29,7 +28,7 @@ class MultiheadAttention(nn.Module):
 
         # Stack all weight matrices 1...h together for efficiency
         # Note that in many implementations you see "bias=False" which is optional
-        self.qkv_proj = nn.Linear(input_dim, 3 * embed_dim)
+        self.qkv_proj = nn.Linear(input_dim, 2 * embed_dim)
         self.o_proj = nn.Linear(embed_dim, embed_dim)
 
         self._reset_parameters()
@@ -48,19 +47,12 @@ class MultiheadAttention(nn.Module):
         # Separate Q, K, V from linear output
         qkv = qkv.reshape(batch_size, seq_length, self.num_heads, 3 * self.head_dim)
         qkv = qkv.permute(0, 2, 1, 3) # [Batch, Head, SeqLen, Dims]
-        q, k, v = qkv.chunk(3, dim=-1)
+        q, k = qkv.chunk(2, dim=-1)
 
         # Determine value outputs
-        values, attention = scaled_dot_product(q, k, v, mask=mask)
+        attention = scaled_dot_product(q, k, mask=mask)
 
-        values = values.permute(0, 2, 1, 3) # [Batch, SeqLen, Head, Dims]
-        values = values.reshape(batch_size, seq_length, self.embed_dim)
-        o = self.o_proj(values)
-
-        if return_attention:
-            return o, attention
-        else:
-            return o
+        return attention
 
 
 TAU = 1.
@@ -164,8 +156,7 @@ class VNDAE_ATTN(BaseVAE):
 
         mu = self.fc_mu(result_1)
         log_var = self.fc_var(result_1)
-        _, attention = self.msa(result_2, return_attention=True)
-
+        attention = self.msa(result_2)
 
         # Split the result into mu and var components
         # of the latent Gaussian distribution
