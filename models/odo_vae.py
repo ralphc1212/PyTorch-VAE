@@ -5,7 +5,7 @@ from torch.nn import functional as F
 from .types_ import *
 
 
-class VanillaVAE(BaseVAE):
+class ODOVAE(BaseVAE):
 
 
     def __init__(self,
@@ -13,7 +13,7 @@ class VanillaVAE(BaseVAE):
                  latent_dim: int,
                  hidden_dims: List = None,
                  **kwargs) -> None:
-        super(VanillaVAE, self).__init__()
+        super(ODOVAE, self).__init__()
 
         self.latent_dim = latent_dim
 
@@ -35,6 +35,8 @@ class VanillaVAE(BaseVAE):
         self.encoder = nn.Sequential(*modules)
         self.fc_mu = nn.Linear(hidden_dims[-1]*4, latent_dim)
         self.fc_var = nn.Linear(hidden_dims[-1]*4, latent_dim)
+
+        self.odo = torch.distributions.geometric.Geometric(0.01)
 
         # Build Decoder
         modules = []
@@ -113,7 +115,9 @@ class VanillaVAE(BaseVAE):
         """
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        return eps * std + mu
+        keep_idx = self.odo.sample().clamp(1.,511.).int()
+        sample = eps * std + mu
+        return sample[:keep_idx]
 
     def forward(self, input: Tensor, **kwargs) -> List[Tensor]:
         mu, log_var = self.encode(input)
@@ -136,7 +140,7 @@ class VanillaVAE(BaseVAE):
         log_var = args[3]
 
         kld_weight = kwargs['M_N'] # Account for the minibatch samples from the dataset
-        recons_loss = F.mse_loss(recons, input)
+        recons_loss =F.mse_loss(recons, input)
 
 
         kld_loss = torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = 1), dim = 0)
@@ -157,6 +161,7 @@ class VanillaVAE(BaseVAE):
         z = torch.randn(num_samples,
                         self.latent_dim)
 
+        z = torch.cat([z[:, :int(SAMPLE_LEN * self.latent_dim)], torch.zeros_like(z[:, :int((1 - SAMPLE_LEN) * self.latent_dim)])], dim = -1)
         z = z.to(current_device)
 
         samples = self.decode(z)
