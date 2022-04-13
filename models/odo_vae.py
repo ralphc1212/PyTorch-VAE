@@ -117,8 +117,8 @@ class ODOVAE(BaseVAE):
         eps = torch.randn_like(std)
         keep_idx = self.odo.sample().clamp(1.,127.).int()
         sample = eps * std + mu
-
-        return sample[:, :keep_idx]
+        sample[:, :keep_idx] = 0.
+        return sample
 
     def forward(self, input: Tensor, **kwargs) -> List[Tensor]:
         mu, log_var = self.encode(input)
