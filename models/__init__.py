@@ -24,6 +24,7 @@ from .dip_vae import *
 from .vnd_ae import *
 from .vnd_ae import *
 from .vnd_ae_attn import *
+from .odo_vae import *
 
 # Aliases
 VAE = VanillaVAE
@@ -53,4 +54,5 @@ vae_models = {'HVAE':HVAE,
               'ConditionalVAE':ConditionalVAE,
               'CategoricalVAE':CategoricalVAE,
               'VNDAE':VNDAE,
-              'VNDAE_ATTN':VNDAE_ATTN}
+              'VNDAE_ATTN':VNDAE_ATTN,
+              'ODOVAE':ODOVAE}
