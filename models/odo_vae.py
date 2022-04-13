@@ -4,7 +4,7 @@ from torch import nn
 from torch.nn import functional as F
 from .types_ import *
 
-SAMPLE_LEN = 1.
+SAMPLE_LEN = 0.25
 
 class ODOVAE(BaseVAE):
 
