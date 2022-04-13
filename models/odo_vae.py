@@ -115,11 +115,11 @@ class ODOVAE(BaseVAE):
         """
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        keep_idx = self.odo.sample().clamp(1.,511.).int()
+        keep_idx = self.odo.sample().clamp(1.,127.).int()
         sample = eps * std + mu
         print(sample.shape)
         exit()
-        return sample[:keep_idx]
+        return sample[:, :keep_idx]
 
     def forward(self, input: Tensor, **kwargs) -> List[Tensor]:
         mu, log_var = self.encode(input)
