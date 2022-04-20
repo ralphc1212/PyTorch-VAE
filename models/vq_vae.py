@@ -47,6 +47,7 @@ class VectorQuantizer(nn.Module):
         quantized_latents = torch.matmul(encoding_one_hot, self.embedding.weight)  # [BHW, D]
         print('quantized_latents', quantized_latents)
         print('quantized_latents shape', quantized_latents.shape)
+        exit()
         quantized_latents = quantized_latents.view(latents_shape)  # [B x H x W x D]
 
         # Compute the VQ Losses
