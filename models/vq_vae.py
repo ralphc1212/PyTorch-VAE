@@ -46,10 +46,12 @@ class VectorQuantizer(nn.Module):
         # Compute the VQ Losses
         commitment_loss = F.mse_loss(quantized_latents.detach(), latents)
         embedding_loss = F.mse_loss(quantized_latents, latents.detach())
-        # interesting
 
+        # interesting
         vq_loss = commitment_loss * self.beta + embedding_loss
 
+        print(latents.shape)
+        print(quantized_latents.shape)
         # Add the residue back to the latents
         quantized_latents = latents + (quantized_latents - latents).detach()
 
