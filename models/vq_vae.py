@@ -42,6 +42,7 @@ class VectorQuantizer(nn.Module):
         encoding_one_hot.scatter_(1, encoding_inds, 1)  # [BHW x K]
         print('encoding_one_hot', encoding_one_hot)
         print('encoding_one_hot shape', encoding_one_hot.shape)
+        print('encoding_one_hot.sum(1)', encoding_one_hot.sum(dim=1))
 
         # Quantize the latents
         quantized_latents = torch.matmul(encoding_one_hot, self.embedding.weight)  # [BHW, D]
