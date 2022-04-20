@@ -34,6 +34,7 @@ class VectorQuantizer(nn.Module):
         # Get the encoding that has the min distance
         encoding_inds = torch.argmin(dist, dim=1).unsqueeze(1)  # [BHW, 1]
         print('encoding_inds', encoding_inds)
+        print('encoding_inds shape', encoding_inds.shape)
         print('max encoding_inds', torch.max(encoding_inds))
         print('min encoding_inds', torch.min(encoding_inds))
 
