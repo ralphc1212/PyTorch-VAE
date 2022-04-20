@@ -45,6 +45,7 @@ class VectorQuantizer(nn.Module):
 
         # Quantize the latents
         quantized_latents = torch.matmul(encoding_one_hot, self.embedding.weight)  # [BHW, D]
+        print('self.embedding.weight shape', self.embedding.weight.shape)
         print('quantized_latents', quantized_latents)
         print('quantized_latents shape', quantized_latents.shape)
         exit()
