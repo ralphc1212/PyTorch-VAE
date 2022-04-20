@@ -33,27 +33,14 @@ class VectorQuantizer(nn.Module):
 
         # Get the encoding that has the min distance
         encoding_inds = torch.argmin(dist, dim=1).unsqueeze(1)  # [BHW, 1]
-        print('encoding_inds', encoding_inds)
-        print('encoding_inds shape', encoding_inds.shape)
-        print('max encoding_inds', torch.max(encoding_inds))
-        print('min encoding_inds', torch.min(encoding_inds))
 
         # Convert to one-hot encodings
         device = latents.device
         encoding_one_hot = torch.zeros(encoding_inds.size(0), self.K, device=device)
-        print('encoding_one_hot', encoding_one_hot)
-        print('encoding_one_hot shape', encoding_one_hot.shape)
         encoding_one_hot.scatter_(1, encoding_inds, 1)  # [BHW x K]
-        print('encoding_one_hot', encoding_one_hot)
-        print('encoding_one_hot shape', encoding_one_hot.shape)
-        print('encoding_one_hot.sum(1)', encoding_one_hot.sum(dim=1))
 
         # Quantize the latents
         quantized_latents = torch.matmul(encoding_one_hot, self.embedding.weight)  # [BHW, D]
-        print('self.embedding.weight shape', self.embedding.weight.shape)
-        print('quantized_latents', quantized_latents)
-        print('quantized_latents shape', quantized_latents.shape)
-        exit()
         quantized_latents = quantized_latents.view(latents_shape)  # [B x H x W x D]
 
         # Compute the VQ Losses
