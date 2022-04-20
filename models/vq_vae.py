@@ -34,6 +34,9 @@ class VectorQuantizer(nn.Module):
         # Get the encoding that has the min distance
         encoding_inds = torch.argmin(dist, dim=1).unsqueeze(1)  # [BHW, 1]
         print('encoding_inds', encoding_inds)
+        print('max encoding_inds', torch.max(encoding_inds))
+        print('min encoding_inds', torch.min(encoding_inds))
+
         # Convert to one-hot encodings
         device = latents.device
         encoding_one_hot = torch.zeros(encoding_inds.size(0), self.K, device=device)
