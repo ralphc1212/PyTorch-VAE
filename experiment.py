@@ -59,6 +59,7 @@ class VAEXperiment(pl.LightningModule):
         self.log_dict({f"val_{key}": val.item() for key, val in val_loss.items()}, sync_dist=True)
 
     def on_validation_end(self) -> None:
+        print('sample image')
         self.sample_images()
         
     def sample_images(self):
