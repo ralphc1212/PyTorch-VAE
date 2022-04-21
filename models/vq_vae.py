@@ -60,6 +60,8 @@ class VectorQuantizer(nn.Module):
         dif = cumsum - s_vnd
         mask0 = dif[:, 1:]
         mask1 = 1. - mask0
+        print(p_vnd.shape)
+        print(mask1.shape)
         s_vnd = torch.cat([torch.ones_like(p_vnd[:,:,:,:RSV_DIM]), mask1], dim = -1)
 
         return mu * s_vnd
