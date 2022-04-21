@@ -69,7 +69,10 @@ class VectorQuantizer(nn.Module):
         coef1 = torch.cat([torch.ones_like(p_vnd[:,:,:,:RSV_DIM]), coef1], dim = -1)
 
         log_frac = torch.log(qv / self.pv + EPS)
-        kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0).mean()
+        print(log_frac.shape)
+        print(qv.shape)
+        exit()
+        kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0, -2, -1).mean()
 
         return mu * s_vnd, kld_vnd
 
