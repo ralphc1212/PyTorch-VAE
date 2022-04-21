@@ -58,7 +58,7 @@ class VectorQuantizer(nn.Module):
 
         cumsum = torch.cumsum(s_vnd, dim=-1)
         dif = cumsum - s_vnd
-        mask0 = dif[:, 1:]
+        mask0 = dif[:, :, :, 1:]
         mask1 = 1. - mask0
         print(p_vnd.shape)
         print(mask1.shape)
