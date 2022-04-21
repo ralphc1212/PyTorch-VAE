@@ -23,7 +23,7 @@ class VectorQuantizer(nn.Module):
         self.D = embedding_dim
         self.beta = beta
 
-        Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
+        Pi = nn.Parameter(PI * torch.ones(embedding_dim - RSV_DIM), requires_grad=False)
 
         self.ZERO = nn.Parameter(torch.tensor([0.]), requires_grad=False)
         self.ONE = nn.Parameter(torch.tensor([1.]), requires_grad=False)
