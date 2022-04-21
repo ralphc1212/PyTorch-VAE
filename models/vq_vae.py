@@ -4,6 +4,8 @@ from torch import nn
 from torch.nn import functional as F
 from .types_ import *
 
+RSV_DIM = 1
+
 class VectorQuantizer(nn.Module):
     """
     Reference:
@@ -12,17 +14,59 @@ class VectorQuantizer(nn.Module):
     def __init__(self,
                  num_embeddings: int,
                  embedding_dim: int,
+                 conv_enc: None,
+                 conv_p_vnd: None,
                  beta: float = 0.25):
         super(VectorQuantizer, self).__init__()
         self.K = num_embeddings
         self.D = embedding_dim
         self.beta = beta
 
+        Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
+
+        self.ZERO = nn.Parameter(torch.tensor([0.]), requires_grad=False)
+        self.ONE = nn.Parameter(torch.tensor([1.]), requires_grad=False)
+        self.pv = nn.Parameter(torch.cat([self.ONE, torch.cumprod(Pi, dim=0)])
+                       * torch.cat([1 - Pi, self.ONE]), requires_grad=False)
+
+        self.conv_enc = conv_enc
+        self.conv_p_vnd = conv_p_vnd
         self.embedding = nn.Embedding(self.K, self.D)
         self.embedding.weight.data.uniform_(-1 / self.K, 1 / self.K)
 
-    def forward(self, latents: Tensor) -> Tensor:
-        latents = latents.permute(0, 2, 3, 1).contiguous()  # [B x D x H x W] -> [B x H x W x D]
+    def reparameterize(self, mu: Tensor, p_vnd: Tensor) -> Tensor:
+        """
+        Reparameterization trick to sample from N(mu, var) from
+        N(0,1).
+        :param mu: (Tensor) Mean of the latent Gaussian [B x D]
+        :param logvar: (Tensor) Standard deviation of the latent Gaussian [B x D]
+        :return: (Tensor) [B x D]
+        """
+        beta = torch.sigmoid(self.clip_beta(p_vnd[:,:,:,RSV_DIM:]))
+        ONES = torch.ones_like(beta[:,:,:,0:1])
+        qv = torch.cat([ONES, torch.cumprod(beta, dim=-1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
+        s_vnd = F.gumbel_softmax(qv, tau=TAU, hard=True)
+
+        cumsum = torch.cumsum(s_vnd, dim=-1)
+        dif = cumsum - s_vnd
+        mask0 = dif[:, 1:]
+        mask1 = 1. - mask0
+        s_vnd = torch.cat([torch.ones_like(p_vnd[:,:,:,:RSV_DIM]), mask1], dim = -1)
+
+        return mu * s_vnd
+
+    def forward(self, emb: Tensor) -> Tensor:
+
+        feat = self.conv_enc(emb)
+        p_vnd = self.conv_p_vnd(emb)
+
+        feat = feat.permute(0, 2, 3, 1).contiguous()  # [B x D x H x W] -> [B x H x W x D]
+        p_vnd = p_vnd.permute(0, 2, 3, 1).contiguous()  # [B x D x H x W] -> [B x H x W x D]
+
+        latents = self.reparameterize(feat, p_vnd)
+        print(latents)
+        print(latents.shape)
+        exit()
         latents_shape = latents.shape
         flat_latents = latents.view(-1, self.D)  # [BHW x D]
 
@@ -50,8 +94,6 @@ class VectorQuantizer(nn.Module):
         # interesting
         vq_loss = commitment_loss * self.beta + embedding_loss
 
-        print(latents.shape)
-        print(quantized_latents.shape)
         # Add the residue back to the latents
         quantized_latents = latents + (quantized_latents - latents).detach()
 
@@ -115,17 +157,25 @@ class VQVAE(BaseVAE):
             modules.append(ResidualLayer(in_channels, in_channels))
         modules.append(nn.LeakyReLU())
 
-        modules.append(
-            nn.Sequential(
-                nn.Conv2d(in_channels, embedding_dim,
-                          kernel_size=1, stride=1),
-                nn.LeakyReLU())
-        )
+        # modules.append(
+        #     nn.Sequential(
+        #         nn.Conv2d(in_channels, embedding_dim,
+        #                   kernel_size=1, stride=1),
+        #         nn.LeakyReLU())
+        # )
 
         self.encoder = nn.Sequential(*modules)
 
         self.vq_layer = VectorQuantizer(num_embeddings,
                                         embedding_dim,
+                                        conv_enc = nn.Sequential(
+                                                        nn.Conv2d(in_channels, embedding_dim,
+                                                                  kernel_size=1, stride=1),
+                                                        nn.LeakyReLU()),
+                                        conv_p_vnd = nn.Sequential(
+                                                        nn.Conv2d(in_channels, embedding_dim,
+                                                                  kernel_size=1, stride=1),
+                                                        nn.LeakyReLU()),
                                         self.beta)
 
         # Build Decoder
@@ -168,6 +218,13 @@ class VQVAE(BaseVAE):
 
         self.decoder = nn.Sequential(*modules)
 
+    @staticmethod
+    def clip_beta(tensor, to=5.):
+        """
+        Shrink all tensor's values to range [-to,to]
+        """
+        return torch.clamp(tensor, -to, to)
+
     def encode(self, input: Tensor) -> List[Tensor]:
         """
         Encodes the input by passing through the encoder network
@@ -175,8 +232,9 @@ class VQVAE(BaseVAE):
         :param input: (Tensor) Input tensor to encoder [N x C x H x W]
         :return: (Tensor) List of latent codes
         """
-        result = self.encoder(input)
-        return [result]
+        emb = self.encoder(input)
+
+        return [emb]
 
     def decode(self, z: Tensor) -> Tensor:
         """
