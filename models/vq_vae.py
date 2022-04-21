@@ -4,6 +4,7 @@ from torch import nn
 from torch.nn import functional as F
 from .types_ import *
 
+TAU = 1.
 PI = 0.95
 RSV_DIM = 1
 
