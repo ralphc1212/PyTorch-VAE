@@ -7,6 +7,7 @@ from .types_ import *
 TAU = 1.
 PI = 0.95
 RSV_DIM = 1
+EPS = 1e-8
 
 class VectorQuantizer(nn.Module):
     """
@@ -62,7 +63,15 @@ class VectorQuantizer(nn.Module):
         mask1 = 1. - mask0
         s_vnd = torch.cat([torch.ones_like(p_vnd[:,:,:,:RSV_DIM]), mask1], dim = -1)
 
-        return mu * s_vnd
+        ZEROS = torch.zeros_like(beta[:,:,:,0:1])
+        cum_sum = torch.cat([ZEROS, torch.cumsum(qv[:, 1:], dim = -1)], dim = -1)[:, :-1]
+        coef1 = torch.sum(qv, dim=-1, keepdim=True) - cum_sum
+        coef1 = torch.cat([torch.ones_like(p_vnd[:,:RSV_DIM]), coef1], dim = -1)
+
+        log_frac = torch.log(qv / self.pv + EPS)
+        kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0).mean()
+
+        return mu * s_vnd, kld_vnd
 
     def forward(self, emb: Tensor) -> Tensor:
 
@@ -72,7 +81,7 @@ class VectorQuantizer(nn.Module):
         feat = feat.permute(0, 2, 3, 1).contiguous()  # [B x D x H x W] -> [B x H x W x D]
         p_vnd = p_vnd.permute(0, 2, 3, 1).contiguous()  # [B x D x H x W] -> [B x H x W x D]
 
-        latents = self.reparameterize(feat, p_vnd)
+        latents, kld_vnd = self.reparameterize(feat, p_vnd)
 
         latents_shape = latents.shape
         flat_latents = latents.view(-1, self.D)  # [BHW x D]
@@ -99,7 +108,7 @@ class VectorQuantizer(nn.Module):
         embedding_loss = F.mse_loss(quantized_latents, latents.detach())
 
         # interesting
-        vq_loss = commitment_loss * self.beta + embedding_loss
+        vq_loss = (commitment_loss + kld_vnd) * self.beta + embedding_loss 
 
         # Add the residue back to the latents
         quantized_latents = latents + (quantized_latents - latents).detach()
