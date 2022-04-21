@@ -176,7 +176,7 @@ class VQVAE(BaseVAE):
                                                         nn.Conv2d(in_channels, embedding_dim,
                                                                   kernel_size=1, stride=1),
                                                         nn.LeakyReLU()),
-                                        self.beta)
+                                        beta = self.beta)
 
         # Build Decoder
         modules = []
