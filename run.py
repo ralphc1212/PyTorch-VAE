@@ -29,7 +29,7 @@ with open(args.filename, 'r') as file:
         print(exc)
 
 
-tb_logger =  TensorBoardLogger(save_dir=config['logging_params']['save_dir'],
+tb_logger = TensorBoardLogger(save_dir=config['logging_params']['save_dir'],
                                name=config['model_params']['name'],)
 
 # For reproducibility

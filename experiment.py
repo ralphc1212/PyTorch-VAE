@@ -46,6 +46,7 @@ class VAEXperiment(pl.LightningModule):
         return train_loss['loss']
 
     def validation_step(self, batch, batch_idx, optimizer_idx = 0):
+        print('validation')
         real_img, labels = batch
         self.curr_device = real_img.device
 
@@ -57,7 +58,6 @@ class VAEXperiment(pl.LightningModule):
 
         self.log_dict({f"val_{key}": val.item() for key, val in val_loss.items()}, sync_dist=True)
 
-        
     def on_validation_end(self) -> None:
         self.sample_images()
         
