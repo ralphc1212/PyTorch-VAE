@@ -60,8 +60,6 @@ class VectorQuantizer(nn.Module):
         dif = cumsum - s_vnd
         mask0 = dif[:, :, :, 1:]
         mask1 = 1. - mask0
-        print(p_vnd.shape)
-        print(mask1.shape)
         s_vnd = torch.cat([torch.ones_like(p_vnd[:,:,:,:RSV_DIM]), mask1], dim = -1)
 
         return mu * s_vnd
@@ -75,9 +73,7 @@ class VectorQuantizer(nn.Module):
         p_vnd = p_vnd.permute(0, 2, 3, 1).contiguous()  # [B x D x H x W] -> [B x H x W x D]
 
         latents = self.reparameterize(feat, p_vnd)
-        print(latents)
-        print(latents.shape)
-        exit()
+        
         latents_shape = latents.shape
         flat_latents = latents.view(-1, self.D)  # [BHW x D]
 
