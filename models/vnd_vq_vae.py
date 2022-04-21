@@ -73,7 +73,7 @@ class VectorQuantizer(nn.Module):
         p_vnd = p_vnd.permute(0, 2, 3, 1).contiguous()  # [B x D x H x W] -> [B x H x W x D]
 
         latents = self.reparameterize(feat, p_vnd)
-        
+
         latents_shape = latents.shape
         flat_latents = latents.view(-1, self.D)  # [BHW x D]
 
@@ -122,7 +122,7 @@ class ResidualLayer(nn.Module):
         return input + self.resblock(input)
 
 
-class VQVAE(BaseVAE):
+class VNDVQVAE(BaseVAE):
 
     def __init__(self,
                  in_channels: int,
@@ -132,7 +132,7 @@ class VQVAE(BaseVAE):
                  beta: float = 0.25,
                  img_size: int = 64,
                  **kwargs) -> None:
-        super(VQVAE, self).__init__()
+        super(VNDVQVAE, self).__init__()
 
         self.embedding_dim = embedding_dim
         self.num_embeddings = num_embeddings

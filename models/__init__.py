@@ -19,6 +19,7 @@ from .logcosh_vae import *
 from .swae import *
 from .miwae import *
 from .vq_vae import *
+from .vnd_vq_vae import *
 from .betatc_vae import *
 from .dip_vae import *
 from .vnd_ae import *
@@ -54,5 +55,6 @@ vae_models = {'HVAE':HVAE,
               'ConditionalVAE':ConditionalVAE,
               'CategoricalVAE':CategoricalVAE,
               'VNDAE':VNDAE,
+              'VNDVQAE':VNDVQAE,
               'VNDAE_ATTN':VNDAE_ATTN,
               'ODOVAE':ODOVAE}
