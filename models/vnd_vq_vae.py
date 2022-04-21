@@ -64,9 +64,9 @@ class VectorQuantizer(nn.Module):
         s_vnd = torch.cat([torch.ones_like(p_vnd[:,:,:,:RSV_DIM]), mask1], dim = -1)
 
         ZEROS = torch.zeros_like(beta[:,:,:,0:1])
-        cum_sum = torch.cat([ZEROS, torch.cumsum(qv[:, 1:], dim = -1)], dim = -1)[:, :-1]
+        cum_sum = torch.cat([ZEROS, torch.cumsum(qv[:, :, :, 1:], dim = -1)], dim = -1)[:, :, :, :-1]
         coef1 = torch.sum(qv, dim=-1, keepdim=True) - cum_sum
-        coef1 = torch.cat([torch.ones_like(p_vnd[:,:RSV_DIM]), coef1], dim = -1)
+        coef1 = torch.cat([torch.ones_like(p_vnd[:,:,:,:RSV_DIM]), coef1], dim = -1)
 
         log_frac = torch.log(qv / self.pv + EPS)
         kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0).mean()
