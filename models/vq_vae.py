@@ -35,6 +35,13 @@ class VectorQuantizer(nn.Module):
         self.embedding = nn.Embedding(self.K, self.D)
         self.embedding.weight.data.uniform_(-1 / self.K, 1 / self.K)
 
+    @staticmethod
+    def clip_beta(tensor, to=5.):
+        """
+        Shrink all tensor's values to range [-to,to]
+        """
+        return torch.clamp(tensor, -to, to)
+
     def reparameterize(self, mu: Tensor, p_vnd: Tensor) -> Tensor:
         """
         Reparameterization trick to sample from N(mu, var) from
@@ -218,13 +225,6 @@ class VQVAE(BaseVAE):
                 nn.Tanh()))
 
         self.decoder = nn.Sequential(*modules)
-
-    @staticmethod
-    def clip_beta(tensor, to=5.):
-        """
-        Shrink all tensor's values to range [-to,to]
-        """
-        return torch.clamp(tensor, -to, to)
 
     def encode(self, input: Tensor) -> List[Tensor]:
         """
