@@ -106,7 +106,7 @@ class BottleneckDec(nn.Module):
             self.bn2 = nn.BatchNorm2d(planes)
         else:
             self.shortcut = nn.Sequential()
-            self.conv2 = nn.Conv2d(planes * self.expansion, padding=1, planes, kernel_size=3)
+            self.conv2 = nn.Conv2d(planes * self.expansion, planes, padding=1, kernel_size=3)
             self.bn2 = nn.BatchNorm2d(planes)
         self.conv1 = nn.Conv2d(planes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
