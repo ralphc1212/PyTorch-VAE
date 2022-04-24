@@ -104,11 +104,11 @@ class BottleneckDec(nn.Module):
         if stride != 1:
         # if stride != 1 or in_planes != planes:
             self.shortcut = nn.Sequential(
-                ResizeConv2d(in_planes, planes, kernel_size=3, scale_factor=self.expansion),
+                ResizeConv2d(in_planes, planes, kernel_size=3, scale_factor=stride),
                 nn.BatchNorm2d(planes)
             )
 
-            self.conv2 = ResizeConv2d(planes * self.expansion, planes, kernel_size=3, scale_factor=self.expansion)
+            self.conv2 = ResizeConv2d(planes * self.expansion, planes, kernel_size=3, scale_factor=stride)
             self.bn2 = nn.BatchNorm2d(planes)
         else:
             self.shortcut = nn.Sequential()
