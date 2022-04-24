@@ -1,5 +1,5 @@
 model_params:
-  name: 'RESNET50VAE'
+  name: 'VanillaVAE'
   in_channels: 3
   latent_dim: 128
 
@@ -25,4 +25,4 @@ trainer_params:
 
 logging_params:
   save_dir: "logs/"
-  name: "RESNET50VAE"
+  name: "VanillaVAE"
