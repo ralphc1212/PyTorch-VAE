@@ -109,8 +109,8 @@ class BottleneckDec(nn.Module):
             )
 
     def forward(self, x):
+        print(x.shape)
         out = F.leaky_relu(self.bn1(self.conv1(x)))
-        print(self.conv2)
         out = F.leaky_relu(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
         out += self.shortcut(x)
