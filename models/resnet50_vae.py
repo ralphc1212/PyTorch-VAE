@@ -121,7 +121,7 @@ class ResNet50Dec(nn.Module):
 
     def __init__(self, num_Blocks=[3,6,4,3], z_dim=10, nc=3):
         super().__init__()
-        self.in_planes = 512
+        self.in_planes = 2048
 
         self.linear = nn.Linear(z_dim, 2048)
 
