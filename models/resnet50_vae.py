@@ -87,11 +87,10 @@ class ResNet50Enc(nn.Module):
 class BottleneckDec(nn.Module):
     expansion = 4
 
-    def __init__(self, in_planes, stride=1):
+    def __init__(self, in_planes, planes, stride=1):
         super().__init__()
-        planes = int(in_planes / self.expansion)
 
-        self.conv3 = nn.Conv2d(in_planes, in_planes, kernel_size=1, bias=False)
+        self.conv3 = nn.Conv2d(in_planes, planes * self.expansion, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(in_planes)
 
         self.shortcut = nn.Sequential()
@@ -99,15 +98,15 @@ class BottleneckDec(nn.Module):
             self.shortcut = nn.Sequential(
                 # nn.Conv2d(in_planes, int(planes / self.expansion),
                 #           kernel_size=1, stride=stride, bias=False),
-                ResizeConv2d(in_planes, planes, kernel_size=3, scale_factor=self.expansion),
+                ResizeConv2d(planes * self.expansion, planes, kernel_size=3, scale_factor=self.expansion),
                 nn.BatchNorm2d(planes)
             )
 
-            self.conv2 = ResizeConv2d(in_planes, planes, kernel_size=3, scale_factor=self.expansion)
+            self.conv2 = ResizeConv2d(planes * self.expansion, planes, kernel_size=3, scale_factor=self.expansion)
             self.bn2 = nn.BatchNorm2d(planes)
         else:
             self.shortcut = nn.Sequential()
-            self.conv2 = Conv2d(in_planes, planes, kernel_size=3, scale_factor=self.expansion)
+            self.conv2 = Conv2d(planes * self.expansion, planes, kernel_size=3, scale_factor=self.expansion)
             self.bn2 = nn.BatchNorm2d(planes)
         self.conv1 = nn.Conv2d(planes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
@@ -138,8 +137,8 @@ class ResNet50Dec(nn.Module):
         strides = [stride] + [1]*(num_Blocks-1)
         layers = []
         for stride in reversed(strides):
-            layers += [block(self.in_planes, stride)]
-        self.in_planes = planes
+            layers += [block(self.in_planes, planes, stride)]
+            self.in_planes = planes
 
         return nn.Sequential(*layers)
 
