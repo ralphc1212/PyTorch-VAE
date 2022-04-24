@@ -125,8 +125,8 @@ class ResNet50Dec(nn.Module):
 
     def forward(self, z):
         x = self.linear(z)
-        x = x.view(z.size(0), 2048, 1, 1)
-        x = F.interpolate(x, scale_factor=4)
+        x = x.view(z.size(0), 512, 2, 2)
+        # x = F.interpolate(x, scale_factor=4)
         x = self.layer4(x)
         x = self.layer3(x)
         x = self.layer2(x)
