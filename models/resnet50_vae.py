@@ -61,8 +61,8 @@ class ResNet50Enc(nn.Module):
         self.layer2 = self._make_layer(BottleneckEnc, 128, num_Blocks[1], stride=2)
         self.layer3 = self._make_layer(BottleneckEnc, 256, num_Blocks[2], stride=2)
         self.layer4 = self._make_layer(BottleneckEnc, 512, num_Blocks[3], stride=2)
-        self.linear1 = nn.Linear(2048, z_dim)
-        self.linear2 = nn.Linear(2048, z_dim)
+        self.linear1 = nn.Linear(1024, z_dim)
+        self.linear2 = nn.Linear(1024, z_dim)
 
     def _make_layer(self, block, planes, num_Blocks, stride):
         strides = [stride] + [1]*(num_Blocks-1)
@@ -78,7 +78,10 @@ class ResNet50Enc(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
+        print(x.shape)
         x = F.adaptive_avg_pool2d(x, 1)
+        print(x.shape)
+        exit()
         x = x.view(x.size(0), -1)
         mu = self.linear1(x)
         logvar = self.linear2(x)
@@ -123,9 +126,9 @@ class ResNet50Dec(nn.Module):
 
     def __init__(self, num_Blocks=[3,6,4,3], z_dim=10, nc=3):
         super().__init__()
-        self.in_planes = 2048
+        self.in_planes = 1024
 
-        self.linear = nn.Linear(z_dim, 2048)
+        self.linear = nn.Linear(z_dim, 1024)
 
         self.layer4 = self._make_layer(BottleneckDec, 512, num_Blocks[3], stride=2)
         self.layer3 = self._make_layer(BottleneckDec, 256, num_Blocks[2], stride=2)
@@ -144,7 +147,7 @@ class ResNet50Dec(nn.Module):
 
     def forward(self, z):
         x = self.linear(z)
-        x = x.view(z.size(0), 2048, 1, 1)
+        x = x.view(z.size(0), 1024, 1, 1)
         x = F.interpolate(x, scale_factor=4)
         x = self.layer4(x)
         x = self.layer3(x)
