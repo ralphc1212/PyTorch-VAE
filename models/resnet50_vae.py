@@ -42,11 +42,11 @@ class BottleneckEnc(nn.Module):
             )
 
     def forward(self, x):
-        out = F.leaky_relu(self.bn1(self.conv1(x)))
-        out = F.leaky_relu(self.bn2(self.conv2(out)))
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.relu(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
         out += self.shortcut(x)
-        out = F.leaky_relu(out)
+        out = F.relu(out)
         return out
 
 class ResNet50Enc(nn.Module):
@@ -73,7 +73,9 @@ class ResNet50Enc(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x = F.leaky_relu(self.bn1(self.conv1(x)))
+        # x = F.leaky_relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn1(self.conv1(x)))
+
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
@@ -113,11 +115,11 @@ class BottleneckDec(nn.Module):
         self.bn1 = nn.BatchNorm2d(planes)
 
     def forward(self, x):
-        out = F.leaky_relu(self.bn3(self.conv3(x)))
-        out = F.leaky_relu(self.bn2(self.conv2(out)))
+        out = F.relu(self.bn3(self.conv3(x)))
+        out = F.relu(self.bn2(self.conv2(out)))
         out = self.bn1(self.conv1(out))
         out += self.shortcut(x)
-        out = F.leaky_relu(out)
+        out = F.relu(out)
         return out
 
 class ResNet50Dec(nn.Module):
