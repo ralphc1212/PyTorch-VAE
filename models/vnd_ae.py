@@ -12,7 +12,6 @@ SAMPLE_LEN = 1.
 
 class VNDAE(BaseVAE):
 
-
     def __init__(self,
                  in_channels: int,
                  latent_dim: int,

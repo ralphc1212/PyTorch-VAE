@@ -26,6 +26,7 @@ from .vnd_ae import *
 from .vnd_ae import *
 from .vnd_ae_attn import *
 from .odo_vae import *
+from .resnet50_vae import *
 
 # Aliases
 VAE = VanillaVAE
@@ -52,6 +53,7 @@ vae_models = {'HVAE':HVAE,
               'FactorVAE':FactorVAE,
               'LogCoshVAE':LogCoshVAE,
               'VanillaVAE':VanillaVAE,
+              'RESNET50VAE':RESNET50VAE,
               'ConditionalVAE':ConditionalVAE,
               'CategoricalVAE':CategoricalVAE,
               'VNDAE':VNDAE,
