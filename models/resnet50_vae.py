@@ -77,9 +77,7 @@ class ResNet50Enc(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-        print(x.shape)
         x = F.adaptive_avg_pool2d(x, 1)
-        print(x.shape)
         x = x.view(x.size(0), -1)
         mu = self.linear1(x)
         logvar = self.linear2(x)
@@ -109,13 +107,12 @@ class BottleneckDec(nn.Module):
             self.bn2 = nn.BatchNorm2d(planes)
         else:
             self.shortcut = nn.Sequential()
-            self.conv2 = Conv2d(planes, planes, kernel_size=3, scale_factor=self.expansion)
+            self.conv2 = Conv2d(in_planes, planes, kernel_size=3, scale_factor=self.expansion)
             self.bn2 = nn.BatchNorm2d(planes)
-        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
+        self.conv1 = nn.Conv2d(planes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
 
     def forward(self, x):
-        print(x.shape)
         out = F.leaky_relu(self.bn3(self.conv3(x)))
         out = F.leaky_relu(self.bn2(self.conv2(out)))
         out = self.bn1(self.conv1(out))
