@@ -91,7 +91,7 @@ class BottleneckDec(nn.Module):
         super().__init__()
 
         self.conv3 = nn.Conv2d(in_planes, planes * self.expansion, kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(in_planes)
+        self.bn3 = nn.BatchNorm2d(planes * self.expansion)
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != planes:
