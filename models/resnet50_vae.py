@@ -58,7 +58,7 @@ class ResNet50Enc(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x = torch.leaky_relu(self.bn1(self.conv1(x)))
+        x = F.leaky_relu(self.bn1(self.conv1(x)))
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
