@@ -96,8 +96,6 @@ class BottleneckDec(nn.Module):
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != planes:
             self.shortcut = nn.Sequential(
-                # nn.Conv2d(in_planes, int(planes / self.expansion),
-                #           kernel_size=1, stride=stride, bias=False),
                 ResizeConv2d(in_planes, planes, kernel_size=3, scale_factor=self.expansion),
                 nn.BatchNorm2d(planes)
             )
@@ -115,8 +113,6 @@ class BottleneckDec(nn.Module):
         out = F.leaky_relu(self.bn3(self.conv3(x)))
         out = F.leaky_relu(self.bn2(self.conv2(out)))
         out = self.bn1(self.conv1(out))
-        print(out.shape)
-        print(self.shortcut(x).shape)
         out += self.shortcut(x)
         out = F.leaky_relu(out)
         return out
