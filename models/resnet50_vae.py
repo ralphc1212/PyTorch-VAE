@@ -41,9 +41,16 @@ class BottleneckEnc(nn.Module):
             )
 
     def forward(self, x):
+        print('------')
         out = F.leaky_relu(self.bn1(self.conv1(x)))
+        print(out.shape)
+
         out = F.leaky_relu(self.bn2(self.conv2(out)))
+        print(out.shape)
+
         out = self.bn3(self.conv3(out))
+        print(out.shape)
+
         out += self.shortcut(x)
         out = F.leaky_relu(out)
         return out
@@ -77,7 +84,6 @@ class ResNet50Enc(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-        print(x.shape)
         exit()
         x = F.adaptive_avg_pool2d(x, 1)
         x = x.view(x.size(0), -1)
