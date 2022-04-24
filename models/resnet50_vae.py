@@ -5,6 +5,19 @@ from torch.nn import functional as F
 from .types_ import *
 #from resnet18 import ResNet18Enc, ResNet18Dec
 
+class ResizeConv2d(nn.Module):
+
+    def __init__(self, in_channels, out_channels, kernel_size, scale_factor, mode='nearest'):
+        super().__init__()
+        self.scale_factor = scale_factor
+        self.mode = mode
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=1)
+
+    def forward(self, x):
+        x = F.interpolate(x, scale_factor=self.scale_factor, mode=self.mode)
+        x = self.conv(x)
+        return x
+
 class BottleneckEnc(nn.Module):
     expansion = 4
 
@@ -78,8 +91,10 @@ class BottleneckDec(nn.Module):
         super().__init__()
         self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.ConvTranspose2d(planes, planes, kernel_size=3,
-                               stride=stride, output_padding=1, bias=False)
+        # self.conv2 = nn.ConvTranspose2d(planes, planes, kernel_size=3,
+        #                        stride=stride, output_padding=1, bias=False)
+        self.conv2 = ResizeConv2d(planes, planes, kernel_size=3, scale_factor=stride)
+
         self.bn2 = nn.BatchNorm2d(planes)
         self.conv3 = nn.Conv2d(planes, int(planes / self.expansion), kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(int(planes / self.expansion))
@@ -87,8 +102,10 @@ class BottleneckDec(nn.Module):
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != int(planes / self.expansion):
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, int(planes / self.expansion),
-                          kernel_size=1, stride=stride, bias=False),
+                # nn.Conv2d(in_planes, int(planes / self.expansion),
+                #           kernel_size=1, stride=stride, bias=False),
+                self.conv2 = ResizeConv2d(in_planes, int(planes / self.expansion), kernel_size=3, scale_factor=stride)
+
                 nn.BatchNorm2d(int(planes / self.expansion))
             )
 
