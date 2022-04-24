@@ -131,7 +131,8 @@ class ResNet50Dec(nn.Module):
         self.layer3 = self._make_layer(BottleneckDec, 256, num_Blocks[2], stride=2)
         self.layer2 = self._make_layer(BottleneckDec, 128, num_Blocks[1], stride=2)
         self.layer1 = self._make_layer(BottleneckDec, 64, num_Blocks[0], stride=1)
-        self.conv1 = nn.ConvTranspose2d(64, nc, kernel_size=3, output_padding=1)
+        # self.conv1 = nn.ConvTranspose2d(64, nc, kernel_size=3, output_padding=1)
+        self.conv1 = ResizeConv2d(64, nc, kernel_size=3, scale_factor=2)
 
     def _make_layer(self, block, planes, num_Blocks, stride):
         strides = [stride] + [1]*(num_Blocks-1)
