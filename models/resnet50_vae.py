@@ -115,6 +115,8 @@ class BottleneckDec(nn.Module):
         out = F.leaky_relu(self.bn3(self.conv3(x)))
         out = F.leaky_relu(self.bn2(self.conv2(out)))
         out = self.bn1(self.conv1(out))
+        print(out.shape)
+        print(x.shape)
         out += self.shortcut(x)
         out = F.leaky_relu(out)
         return out
