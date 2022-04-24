@@ -74,15 +74,10 @@ class ResNet50Enc(nn.Module):
 
     def forward(self, x):
         x = F.leaky_relu(self.bn1(self.conv1(x)))
-        print(x.shape)
         x = self.layer1(x)
-        print(x.shape)
         x = self.layer2(x)
-        print(x.shape)
         x = self.layer3(x)
-        print(x.shape)
         x = self.layer4(x)
-        print(x.shape)
         x = F.adaptive_avg_pool2d(x, 1)
         x = x.view(x.size(0), -1)
         mu = self.linear1(x)
@@ -153,17 +148,11 @@ class ResNet50Dec(nn.Module):
         x = self.linear(z)
         x = x.view(z.size(0), 1024, 1, 1)
         x = F.interpolate(x, scale_factor=4)
-        print(x.shape)
         x = self.layer4(x)
-        print(x.shape)
         x = self.layer3(x)
-        print(x.shape)
         x = self.layer2(x)
-        print(x.shape)
         x = self.layer1(x)
-        print(x.shape)
         x = torch.sigmoid(self.conv1(x))
-        print(x.shape)
         x = x.view(x.size(0), 3, 64, 64)
         return x
 
