@@ -160,6 +160,7 @@ class ResNet50Dec(nn.Module):
         x = self.layer2(x)
         print(x.shape)
         x = self.layer1(x)
+        print(x.shape)
         x = torch.sigmoid(self.conv1(x))
         print(x.shape)
         x = x.view(x.size(0), 3, 64, 64)
