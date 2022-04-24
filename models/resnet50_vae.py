@@ -49,11 +49,11 @@ class ResNet50Enc(nn.Module):
         self.layer4 = self._make_layer(BottleneckEnc, 512, num_Blocks[3], stride=2)
         self.linear = nn.Linear(512, 2 * z_dim)
 
-    def _make_layer(self, BottleneckEnc, planes, num_Blocks, stride):
+    def _make_layer(self, block, planes, num_Blocks, stride):
         strides = [stride] + [1]*(num_Blocks-1)
         layers = []
         for stride in strides:
-            layers += [BottleneckEnc(self.in_planes, planes, stride)]
+            layers += [block(self.in_planes, planes, stride)]
             self.in_planes = int(planes * block.expansion)
         return nn.Sequential(*layers)
 
@@ -114,11 +114,11 @@ class ResNet50Dec(nn.Module):
         self.layer1 = self._make_layer(BottleneckDec, 64, num_Blocks[0], stride=1)
         self.conv1 = nn.ConvTranspose2d(64, nc, kernel_size=3, output_padding=1)
 
-    def _make_layer(self, BottleneckDec, planes, num_Blocks, stride):
+    def _make_layer(self, block, planes, num_Blocks, stride):
         strides = [stride] + [1]*(num_Blocks-1)
         layers = []
         for stride in reversed(strides):
-            layers += [BottleneckDec(self.in_planes, planes, stride)]
+            layers += [block(self.in_planes, planes, stride)]
         self.in_planes = int(planes / block.expansion)
 
         return nn.Sequential(*layers)
