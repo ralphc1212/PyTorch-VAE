@@ -89,25 +89,25 @@ class BottleneckDec(nn.Module):
 
     def __init__(self, in_planes, stride=1):
         super().__init__()
-        planes = int(in_planes / stride)
+        planes = int(in_planes / expansion)
 
         self.conv3 = nn.Conv2d(in_planes, in_planes, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(in_planes)
 
         self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != int(planes / self.expansion):
+        if stride != 1 or in_planes != planes:
             self.shortcut = nn.Sequential(
                 # nn.Conv2d(in_planes, int(planes / self.expansion),
                 #           kernel_size=1, stride=stride, bias=False),
-                ResizeConv2d(in_planes, int(planes / self.expansion), kernel_size=3, scale_factor=stride),
-                nn.BatchNorm2d(int(planes / self.expansion))
+                ResizeConv2d(in_planes, planes, kernel_size=3, scale_factor=expansion),
+                nn.BatchNorm2d(planes)
             )
 
-            self.conv2 = ResizeConv2d(planes, planes, kernel_size=3, scale_factor=stride)
+            self.conv2 = ResizeConv2d(in_planes, planes, kernel_size=3, scale_factor=expansion)
             self.bn2 = nn.BatchNorm2d(planes)
         else:
             self.shortcut = nn.Sequential()
-            self.conv2 = Conv2d(planes, planes, kernel_size=3, scale_factor=stride)
+            self.conv2 = Conv2d(planes, planes, kernel_size=3, scale_factor=expansion)
             self.bn2 = nn.BatchNorm2d(planes)
         self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
