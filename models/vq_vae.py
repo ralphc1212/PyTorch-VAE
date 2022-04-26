@@ -220,12 +220,10 @@ class VQVAE(BaseVAE):
                 'Reconstruction_Loss': recons_loss,
                 'VQ_Loss':vq_loss}
 
-    def sample(self,
-               num_samples: int,
-               current_device: Union[int, str], **kwargs) -> Tensor:
+    def sample(self, batch_idx: int, bs: int, **kwargs) -> Tensor:
         # raise Warning('VQVAE sampler is not implemented.')
         code = self.vq_layer.embedding.weight
-        
+        return self.decode(code[int(batch_idx * bs) : ((batch_idx + 1) * bs)])
 
     def generate(self, x: Tensor, **kwargs) -> Tensor:
         """

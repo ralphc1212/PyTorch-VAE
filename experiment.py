@@ -21,8 +21,8 @@ class VAEXperiment(pl.LightningModule):
 
         self.model = vae_model
         self.params = params['exp_params']
-        print(params)
-        exit()
+        self.name = params['model_params']['name']
+        self.val_bs = params['data_params']['val_batch_size']
         self.curr_device = None
         self.hold_graph = False
         try:
@@ -80,15 +80,27 @@ class VAEXperiment(pl.LightningModule):
                           nrow=12)
 
         try:
-            samples = self.model.sample(144,
-                                        self.curr_device,
-                                        labels = test_label)
-            vutils.save_image(samples.cpu().data,
-                              os.path.join(self.logger.log_dir , 
-                                           "Samples",      
-                                           f"{self.logger.name}_Epoch_{self.current_epoch}.png"),
-                              normalize=True,
-                              nrow=12)
+            if self.name == 'VQVAE':
+                n_iters = int(self.model.num_embeddings / self.val_bs):
+                for i in range(n_iters):
+                    samples = self.model.sample(i, self.val_bs)
+                    vutils.save_image(samples.cpu().data,
+                                      os.path.join(self.logger.log_dir , 
+                                                   "Samples",      
+                                                   f"{self.logger.name}_Epoch_{self.current_epoch}_Code_{i}.png"),
+                                      normalize=True,
+                                      nrow=12)
+
+            else:
+                samples = self.model.sample(144,
+                                            self.curr_device,
+                                            labels = test_label)
+                vutils.save_image(samples.cpu().data,
+                                  os.path.join(self.logger.log_dir , 
+                                               "Samples",      
+                                               f"{self.logger.name}_Epoch_{self.current_epoch}.png"),
+                                  normalize=True,
+                                  nrow=12)
         except Warning:
             pass
 
