@@ -60,4 +60,4 @@ Path(f"{tb_logger.log_dir}/Reconstructions").mkdir(exist_ok=True, parents=True)
 # print(f"======= Training {config['model_params']['name']} =======")
 # runner.fit(experiment, datamodule=data)
 
-runner.validate(experiment, ckpt_path='~/projects/PyTorch-VAE/logs/ODOVAE/_version_trained/checkpoints/last.ckpt', datamodule=data)
+runner.validate(experiment, ckpt_path='~/projects/PyTorch-VAE/logs/VQVAE/_trained_celebA_64/checkpoints/last.ckpt', datamodule=data)
