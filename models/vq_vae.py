@@ -207,8 +207,8 @@ class VQVAE(BaseVAE):
         kld_weight = kwargs['M_N']
 
         # loss = recons_loss + self.beta * kld_weight * vq_loss
-        # loss = recons_loss + self.beta * vq_loss
-        loss = recons_loss + vq_loss
+        loss = recons_loss + self.beta * vq_loss
+        # loss = recons_loss + vq_loss
 
         return {'loss': loss,
                 'Reconstruction_Loss': recons_loss,
