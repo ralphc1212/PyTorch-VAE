@@ -49,7 +49,7 @@ class gradient_hook(pytorch_lightning.callbacks.Callback):
         grad = pl_module.model.vq_layer.embedding.weight.grad
         print(grad.nonzero().sum())
         print(grad.sum().item() / grad.nonzero().sum())
-        exit()
+        # exit()
 
 data.setup()
 runner = Trainer(logger=tb_logger,
