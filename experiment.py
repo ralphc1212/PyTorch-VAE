@@ -20,7 +20,9 @@ class VAEXperiment(pl.LightningModule):
         super(VAEXperiment, self).__init__()
 
         self.model = vae_model
-        self.params = params
+        self.params = params['exp_params']
+        print(params)
+        exit()
         self.curr_device = None
         self.hold_graph = False
         try:

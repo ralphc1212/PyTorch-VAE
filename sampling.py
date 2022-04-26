@@ -57,7 +57,6 @@ runner = Trainer(logger=tb_logger,
 Path(f"{tb_logger.log_dir}/Samples").mkdir(exist_ok=True, parents=True)
 Path(f"{tb_logger.log_dir}/Reconstructions").mkdir(exist_ok=True, parents=True)
 
-
 # print(f"======= Training {config['model_params']['name']} =======")
 # runner.fit(experiment, datamodule=data)
 

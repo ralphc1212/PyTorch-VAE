@@ -4,6 +4,12 @@ from torch import nn
 from torch.nn import functional as F
 from .types_ import *
 
+# embedding_dim
+# 25%:  16
+# 50%:  32
+# 75%:  48
+# 100%: 64
+
 class VectorQuantizer(nn.Module):
     """
     Reference:
@@ -217,7 +223,9 @@ class VQVAE(BaseVAE):
     def sample(self,
                num_samples: int,
                current_device: Union[int, str], **kwargs) -> Tensor:
-        raise Warning('VQVAE sampler is not implemented.')
+        # raise Warning('VQVAE sampler is not implemented.')
+        code = self.vq_layer.embedding.weight
+        
 
     def generate(self, x: Tensor, **kwargs) -> Tensor:
         """

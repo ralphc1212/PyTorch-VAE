@@ -37,7 +37,7 @@ seed_everything(config['exp_params']['manual_seed'], True)
 
 model = vae_models[config['model_params']['name']](**config['model_params'])
 experiment = VAEXperiment(model,
-                          config['exp_params'])
+                          config)
 
 data = VAEDataset(**config["data_params"], pin_memory=len(config['trainer_params']['gpus']) != 0)
 
