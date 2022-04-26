@@ -40,7 +40,8 @@ class VAEXperiment(pl.LightningModule):
                                               M_N = self.params['kld_weight'], #al_img.shape[0]/ self.num_train_imgs,
                                               optimizer_idx=optimizer_idx,
                                               batch_idx = batch_idx)
-
+        print(train_loss)
+        exit()
         self.log_dict({key: val.item() for key, val in train_loss.items()}, sync_dist=True)
 
         return train_loss['loss']
@@ -61,7 +62,7 @@ class VAEXperiment(pl.LightningModule):
     def on_validation_end(self) -> None:
         # print('sample image')
         self.sample_images()
-        
+
     def sample_images(self):
         # Get sample reconstruction image            
         test_input, test_label = next(iter(self.trainer.datamodule.test_dataloader()))

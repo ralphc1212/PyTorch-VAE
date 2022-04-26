@@ -206,9 +206,6 @@ class VQVAE(BaseVAE):
         recons_loss = F.mse_loss(recons, input)
         kld_weight = kwargs['M_N']
 
-        print(recons_loss)
-        print(vq_loss)
-        exit()
         loss = recons_loss + self.beta * kld_weight * vq_loss
         # loss = recons_loss + self.beta * vq_loss
 
