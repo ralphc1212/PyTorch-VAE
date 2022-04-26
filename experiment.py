@@ -74,7 +74,7 @@ class VAEXperiment(pl.LightningModule):
         if self.name == 'VQVAE':
             recons, codes = self.model.generate(test_input, labels = test_label)
             rshape = recons.shape
-            codes = codes.reshape[rshape[0], -1, rshape[2], rshape[3]]
+            codes = codes.reshape(rshape[0], -1, rshape[2], rshape[3])
 
             vutils.save_image(recons.data,
                               os.path.join(self.logger.log_dir , 
