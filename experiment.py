@@ -90,7 +90,7 @@ class VAEXperiment(pl.LightningModule):
                                                    f"{self.logger.name}_Epoch_{self.current_epoch}_Code_{i}.png"),
                                       normalize=True,
                                       nrow=12)
-
+                exit()
             else:
                 samples = self.model.sample(144,
                                             self.curr_device,
