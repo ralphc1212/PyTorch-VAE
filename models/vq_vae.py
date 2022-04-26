@@ -31,9 +31,6 @@ class VectorQuantizer(nn.Module):
                torch.sum(self.embedding.weight ** 2, dim=1) - \
                2 * torch.matmul(flat_latents, self.embedding.weight.t())  # [BHW x K]
 
-        print(dist)
-        print(self.embedding.weight.requires_grad())
-        exit()
         # Get the encoding that has the min distance
         encoding_inds = torch.argmin(dist, dim=1).unsqueeze(1)  # [BHW, 1]
 
@@ -54,8 +51,6 @@ class VectorQuantizer(nn.Module):
 
         # Add the residue back to the latents
         quantized_latents = latents + (quantized_latents - latents).detach()
-        print(quantized_latents.shape)
-        exit()
         return quantized_latents.permute(0, 3, 1, 2).contiguous(), vq_loss  # [B x D x H x W]
 
 

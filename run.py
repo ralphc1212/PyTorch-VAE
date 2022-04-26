@@ -41,6 +41,17 @@ experiment = VAEXperiment(model,
 
 data = VAEDataset(**config["data_params"], pin_memory=len(config['trainer_params']['gpus']) != 0)
 
+class gradient_hook(pytorch_lightning.callbacks.Callback):
+    def __init__() -> None:
+    super(gradient_hook, self).__init__()
+
+    def on_after_backward(trainer, pl_module, model):
+        print(model.vq_layer.embedding.weight.grad)
+        exit()
+
+
+
+
 data.setup()
 runner = Trainer(logger=tb_logger,
                  callbacks=[
@@ -49,6 +60,7 @@ runner = Trainer(logger=tb_logger,
                                      dirpath =os.path.join(tb_logger.log_dir , "checkpoints"), 
                                      monitor= "val_loss",
                                      save_last= True),
+                     gradient_hook()
                  ],
                  strategy=DDPPlugin(find_unused_parameters=False),
                  **config['trainer_params'])
