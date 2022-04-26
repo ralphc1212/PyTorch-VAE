@@ -47,7 +47,7 @@ class gradient_hook(pytorch_lightning.callbacks.Callback):
 
     def on_after_backward(self, trainer, pl_module):
         grad = pl_module.model.vq_layer.embedding.weight.grad
-        print(grad.non_zero().sum())
+        print(grad.nonzero().sum())
         exit()
 
 
