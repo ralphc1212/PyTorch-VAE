@@ -43,7 +43,7 @@ data = VAEDataset(**config["data_params"], pin_memory=len(config['trainer_params
 
 class gradient_hook(pytorch_lightning.callbacks.Callback):
     def __init__() -> None:
-    super(gradient_hook, self).__init__()
+        super(gradient_hook, self).__init__()
 
     def on_after_backward(trainer, pl_module, model):
         print(model.vq_layer.embedding.weight.grad)
