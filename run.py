@@ -51,9 +51,6 @@ class gradient_hook(pytorch_lightning.callbacks.Callback):
         print(grad.sum().item() / grad.nonzero().sum())
         exit()
 
-
-
-
 data.setup()
 runner = Trainer(logger=tb_logger,
                  callbacks=[
