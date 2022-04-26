@@ -62,7 +62,7 @@ runner = Trainer(logger=tb_logger,
                                      dirpath =os.path.join(tb_logger.log_dir , "checkpoints"), 
                                      monitor= "val_loss",
                                      save_last= True),
-                     gradient_hook()
+                     # gradient_hook()
                  ],
                  strategy=DDPPlugin(find_unused_parameters=False),
                  **config['trainer_params'])
