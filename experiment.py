@@ -71,36 +71,36 @@ class VAEXperiment(pl.LightningModule):
         test_label = test_label.to(self.curr_device)
 
 #         test_input, test_label = batch
-        recons = self.model.generate(test_input, labels = test_label)
-        vutils.save_image(recons.data,
-                          os.path.join(self.logger.log_dir , 
-                                       "Reconstructions", 
-                                       f"recons_{self.logger.name}_Epoch_{self.current_epoch}.png"),
-                          normalize=True,
-                          nrow=12)
+        if self.name == 'VQVAE':
+            recons, codes = self.model.generate(test_input, labels = test_label)
+            print(codes.shape)
+            exit()
+            vutils.save_image(recons.data,
+                              os.path.join(self.logger.log_dir , 
+                                           "Reconstructions", 
+                                           f"recons_{self.logger.name}_Epoch_{self.current_epoch}.png"),
+                              normalize=True,
+                              nrow=12)
+
+        else:
+            recons = self.model.generate(test_input, labels = test_label)
+            vutils.save_image(recons.data,
+                              os.path.join(self.logger.log_dir , 
+                                           "Reconstructions", 
+                                           f"recons_{self.logger.name}_Epoch_{self.current_epoch}.png"),
+                              normalize=True,
+                              nrow=12)
 
         try:
-            if self.name == 'VQVAE':
-                n_iters = int(self.model.num_embeddings / self.val_bs)
-                for i in range(n_iters):
-                    samples = self.model.sample(i, self.val_bs)
-                    vutils.save_image(samples.cpu().data,
-                                      os.path.join(self.logger.log_dir , 
-                                                   "Samples",      
-                                                   f"{self.logger.name}_Epoch_{self.current_epoch}_Code_{i}.png"),
-                                      normalize=True,
-                                      nrow=12)
-                exit()
-            else:
-                samples = self.model.sample(144,
-                                            self.curr_device,
-                                            labels = test_label)
-                vutils.save_image(samples.cpu().data,
-                                  os.path.join(self.logger.log_dir , 
-                                               "Samples",      
-                                               f"{self.logger.name}_Epoch_{self.current_epoch}.png"),
-                                  normalize=True,
-                                  nrow=12)
+            samples = self.model.sample(144,
+                                        self.curr_device,
+                                        labels = test_label)
+            vutils.save_image(samples.cpu().data,
+                              os.path.join(self.logger.log_dir , 
+                                           "Samples",      
+                                           f"{self.logger.name}_Epoch_{self.current_epoch}.png"),
+                              normalize=True,
+                              nrow=12)
         except Warning:
             pass
 

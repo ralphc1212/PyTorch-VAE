@@ -57,7 +57,6 @@ class VectorQuantizer(nn.Module):
 
         # Add the residue back to the latents
         quantized_latents = latents + (quantized_latents - latents).detach()
-        print(quantized_latents.shape)
         return quantized_latents.permute(0, 3, 1, 2).contiguous(), vq_loss  # [B x D x H x W]
 
 
@@ -196,7 +195,7 @@ class VQVAE(BaseVAE):
     def forward(self, input: Tensor, **kwargs) -> List[Tensor]:
         encoding = self.encode(input)[0]
         quantized_inputs, vq_loss = self.vq_layer(encoding)
-        return [self.decode(quantized_inputs), input, vq_loss]
+        return [self.decode(quantized_inputs), input, vq_loss, quantized_inputs]
 
     def loss_function(self,
                       *args,
@@ -221,10 +220,12 @@ class VQVAE(BaseVAE):
                 'Reconstruction_Loss': recons_loss,
                 'VQ_Loss':vq_loss}
 
-    def sample(self, batch_idx: int, bs: int, **kwargs) -> Tensor:
-        # raise Warning('VQVAE sampler is not implemented.')
-        code = self.vq_layer.embedding.weight
-        return self.decode(code[int(batch_idx * bs) : ((batch_idx + 1) * bs)])
+    def sample(self,
+               num_samples:int,
+               current_device: int, **kwargs) -> Tensor:
+        raise Warning('VQVAE sampler is not implemented.')
+        # code = self.vq_layer.embedding.weight
+        # return self.decode(code[int(batch_idx * bs) : ((batch_idx + 1) * bs)])
 
     def generate(self, x: Tensor, **kwargs) -> Tensor:
         """
@@ -232,5 +233,5 @@ class VQVAE(BaseVAE):
         :param x: (Tensor) [B x C x H x W]
         :return: (Tensor) [B x C x H x W]
         """
-
-        return self.forward(x)[0]
+        results = self.forward(x)
+        return results[0], results[3]
