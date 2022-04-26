@@ -73,8 +73,16 @@ class VAEXperiment(pl.LightningModule):
 #         test_input, test_label = batch
         if self.name == 'VQVAE':
             recons, codes = self.model.generate(test_input, labels = test_label)
+            print(recons.shape)
             print(codes.shape)
             exit()
+            vutils.save_image(recons.data,
+                              os.path.join(self.logger.log_dir , 
+                                           "Reconstructions", 
+                                           f"recons_{self.logger.name}_Epoch_{self.current_epoch}.png"),
+                              normalize=True,
+                              nrow=12)
+
             vutils.save_image(recons.data,
                               os.path.join(self.logger.log_dir , 
                                            "Reconstructions", 
