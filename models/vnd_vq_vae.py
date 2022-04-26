@@ -73,7 +73,7 @@ class VectorQuantizer(nn.Module):
         print(qv.shape)
         exit()
         # kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0, -2, -1).mean()
-        kld_vnd = torch.diagonal(torch.einsum('abcd,efgd->abefcg'), 0, -2, -1).mean()
+        kld_vnd = torch.diagonal(torch.einsum('abcd, efgd -> abefcg'), 0, -2, -1).mean()
 
         return mu * s_vnd, kld_vnd
 

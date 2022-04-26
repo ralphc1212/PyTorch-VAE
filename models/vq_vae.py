@@ -51,7 +51,9 @@ class VectorQuantizer(nn.Module):
 
         # Add the residue back to the latents
         quantized_latents = latents + (quantized_latents - latents).detach()
-
+        
+        print(quantized_latents)
+        exit()
         return quantized_latents.permute(0, 3, 1, 2).contiguous(), vq_loss  # [B x D x H x W]
 
 class ResidualLayer(nn.Module):
