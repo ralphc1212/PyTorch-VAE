@@ -45,7 +45,7 @@ class gradient_hook(pytorch_lightning.callbacks.Callback):
     def __init__(self) -> None:
         super(gradient_hook, self).__init__()
 
-    def on_after_backward(trainer, pl_module):
+    def on_after_backward(self, trainer, pl_module):
         print(trainer.model.vq_layer.embedding.weight.grad)
         exit()
 
