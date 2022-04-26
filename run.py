@@ -42,7 +42,7 @@ experiment = VAEXperiment(model,
 data = VAEDataset(**config["data_params"], pin_memory=len(config['trainer_params']['gpus']) != 0)
 
 class gradient_hook(pytorch_lightning.callbacks.Callback):
-    def __init__() -> None:
+    def __init__(self) -> None:
         super(gradient_hook, self).__init__()
 
     def on_after_backward(trainer, pl_module, model):
