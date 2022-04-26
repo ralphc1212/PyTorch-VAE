@@ -81,7 +81,7 @@ class VAEXperiment(pl.LightningModule):
 
         try:
             if self.name == 'VQVAE':
-                n_iters = int(self.model.num_embeddings / self.val_bs):
+                n_iters = int(self.model.num_embeddings / self.val_bs)
                 for i in range(n_iters):
                     samples = self.model.sample(i, self.val_bs)
                     vutils.save_image(samples.cpu().data,
