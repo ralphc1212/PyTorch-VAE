@@ -40,7 +40,6 @@ class VAEXperiment(pl.LightningModule):
                                               M_N = self.params['kld_weight'], #al_img.shape[0]/ self.num_train_imgs,
                                               optimizer_idx=optimizer_idx,
                                               batch_idx = batch_idx)
-        print(train_loss['loss'].item())
 
         self.log_dict({key: val.item() for key, val in train_loss.items()}, sync_dist=True)
 
