@@ -6,7 +6,7 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 from torchvision.utils import save_image
 
-bs = 100
+bs = 128
 # MNIST Dataset
 train_dataset = datasets.MNIST(root='./mnist_data/', train=True, transform=transforms.ToTensor(), download=True)
 test_dataset = datasets.MNIST(root='./mnist_data/', train=False, transform=transforms.ToTensor(), download=False)
@@ -19,7 +19,7 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=bs, s
 class VAE(nn.Module):
     def __init__(self, x_dim, h_dim1, h_dim2, z_dim):
         super(VAE, self).__init__()
-        
+
         # encoder part
         self.fc1 = nn.Linear(x_dim, h_dim1)
         self.fc2 = nn.Linear(h_dim1, h_dim2)
@@ -36,7 +36,7 @@ class VAE(nn.Module):
         return self.fc31(h), self.fc32(h) # mu, log_var
     
     def sampling(self, mu, log_var):
-        std = torch.exp(0.5*log_var)
+        std = torch.exp(0.5 * log_var)
         eps = torch.randn_like(std)
         return eps.mul(std).add_(mu) # return z sample
         
