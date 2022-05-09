@@ -51,7 +51,7 @@ class VAE(nn.Module):
         return self.decoder(z), mu, log_var
 
 # build model
-vae = VAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=2)
+vae = VAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=4)
 if torch.cuda.is_available():
     vae.cuda()
 
