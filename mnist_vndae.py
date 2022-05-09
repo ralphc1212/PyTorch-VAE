@@ -62,7 +62,7 @@ def loss_function(recon_x, x, mu, log_var):
     KLD = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
     return BCE + KLD
 
- def train(epoch):
+def train(epoch):
     vae.train()
     train_loss = 0
     for batch_idx, (data, _) in enumerate(train_loader):
