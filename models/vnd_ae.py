@@ -130,6 +130,7 @@ class VNDAE(BaseVAE):
         :param logvar: (Tensor) Standard deviation of the latent Gaussian [B x D]
         :return: (Tensor) [B x D]
         """
+
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
