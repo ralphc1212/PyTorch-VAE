@@ -154,9 +154,24 @@ for epoch in range(1, 51):
     train(epoch)
     test()
 
-# with torch.no_grad():
-#     z = torch.randn(64, 4).cuda()
-#     sample = vae.decoder(z).cuda()
 
-#     save_image(sample.view(64, 1, 28, 28), './mnist_samples/sample_vnd' + '.png')
+with torch.no_grad():
+    z = torch.randn(64, 8).cuda()
+    for len_ in range(8):
+        l_ = len_ + 1
+        z_ = torch.cat([z[:, :l_], torch.zeros_like(z[:, :8 - l_])], dim = -1)
+
+        sample_1 = vae.decoder(z_).cuda()
+
+        onehot = torch.nn.functional.one_hot(len_, num_classes=8)
+
+        z_ = z * onehot
+
+        sample_2 = vae.decoder(z_).cuda()
+
+        save_image(sample_1.view(64, 1, 28, 28), './mnist_samples/sample_vnd_len_'+ str(len_) + '.png')
+        save_image(sample_2.view(64, 1, 28, 28), './mnist_samples/sample_vnd_dim_'+ str(len_) + '.png')
+
+
+
 
