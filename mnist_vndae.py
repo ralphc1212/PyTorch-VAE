@@ -64,8 +64,6 @@ class VNDAE(nn.Module):
         coef1 = torch.sum(qv, dim=1, keepdim=True) - cum_sum
         coef1 = torch.cat([torch.ones_like(p_vnd[:,:RSV_DIM]), coef1], dim = -1)
 
-        kld_weight = kwargs['M_N'] # Account for the minibatch samples from the dataset
-
         kld_weighted_gaussian = torch.diagonal(kld_gaussian.mm(coef1.t()), 0).mean()
 
         log_frac = torch.log(qv / self.pv + EPS)
