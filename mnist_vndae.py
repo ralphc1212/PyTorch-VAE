@@ -52,7 +52,7 @@ class VNDAE(nn.Module):
         return torch.clamp(tensor, -to, to)
 
     def loss_function(self, recon_x, x, mu, log_var, p_vnd):
-        BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction='sum')
+        BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction='mean')
         kld_gaussian = - 0.5 * (1 + log_var - mu ** 2 - log_var.exp())
 
         beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
