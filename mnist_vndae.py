@@ -12,6 +12,8 @@ RSV_DIM = 1
 EPS = 1e-8
 SAMPLE_LEN = 1.
 
+LATENT = 4
+
 bs = 64
 # MNIST Dataset
 train_dataset = datasets.MNIST(root='./mnist_data/', train=True, transform=transforms.ToTensor(), download=True)
@@ -82,7 +84,7 @@ class VNDAE(nn.Module):
 
     def sampling(self, mu, log_var, p_vnd):
         std = torch.exp(0.5 * log_var)
-        eps = torch.randn_like(std)\
+        eps = torch.randn_like(std)
 
         beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
         ONES = torch.ones_like(beta[:,0:1])
@@ -105,10 +107,10 @@ class VNDAE(nn.Module):
     def forward(self, x):
         mu, log_var, p_vnd = self.encoder(x.view(-1, 784))
         z = self.sampling(mu, log_var, p_vnd)
-        return self.decoder(z), mu, log_var, p_vnd
+        return self.decoder(z), mu, log_var, p_vnd 
 
 # build model
-vae = VNDAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=16)
+vae = VNDAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=LATENT)
 if torch.cuda.is_available():
     vae.cuda()
 
@@ -156,14 +158,14 @@ for epoch in range(1, 51):
 
 
 with torch.no_grad():
-    z = torch.randn(64, 16).cuda()
-    for len_ in range(16):
+    z = torch.randn(64, LATENT).cuda()
+    for len_ in range(LATENT):
         l_ = len_ + 1
-        z_ = torch.cat([z[:, :l_], torch.zeros_like(z[:, :16 - l_])], dim = -1)
+        z_ = torch.cat([z[:, :l_], torch.zeros_like(z[:, :LATENT - l_])], dim = -1)
 
         sample_1 = vae.decoder(z_).cuda()
 
-        onehot = torch.nn.functional.one_hot(torch.tensor([len_]), num_classes=16).to(z.device)
+        onehot = torch.nn.functional.one_hot(torch.tensor([len_]), num_classes=LATENT).to(z.device)
 
         z_ = z * onehot
 
