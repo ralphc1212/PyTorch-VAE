@@ -67,7 +67,7 @@ class VNDAE(nn.Module):
         return self.decoder(z), mu, log_var, p_vnd
 
 # build model
-vae = VAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=4)
+vae = VNDAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=4)
 if torch.cuda.is_available():
     vae.cuda()
 
