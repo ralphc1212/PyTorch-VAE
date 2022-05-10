@@ -163,7 +163,7 @@ with torch.no_grad():
 
         sample_1 = vae.decoder(z_).cuda()
 
-        onehot = torch.nn.functional.one_hot(len_, num_classes=8)
+        onehot = torch.nn.functional.one_hot(torch.tensor([len_]), num_classes=8)
 
         z_ = z * onehot
 
