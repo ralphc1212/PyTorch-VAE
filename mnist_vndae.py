@@ -34,6 +34,13 @@ class VNDAE(nn.Module):
         self.fc5 = nn.Linear(h_dim2, h_dim1)
         self.fc6 = nn.Linear(h_dim1, x_dim)
 
+    @staticmethod
+    def clip_beta(tensor, to=5.):
+        """
+        Shrink all tensor's values to range [-to,to]
+        """
+        return torch.clamp(tensor, -to, to)
+        
     def encoder(self, x):
         h = F.relu(self.fc1(x))
         h = F.relu(self.fc2(h))
