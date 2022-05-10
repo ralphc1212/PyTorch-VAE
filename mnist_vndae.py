@@ -108,7 +108,7 @@ class VNDAE(nn.Module):
         return self.decoder(z), mu, log_var, p_vnd
 
 # build model
-vae = VNDAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=4)
+vae = VNDAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=8)
 if torch.cuda.is_available():
     vae.cuda()
 
@@ -145,7 +145,7 @@ def test():
             recon, mu, log_var, p_vnd = vae(data)
 
             # sum up batch loss
-            test_loss += loss_function(recon, data, mu, log_var, p_vnd).item()
+            test_loss += vae.loss_function(recon, data, mu, log_var, p_vnd).item()
 
     test_loss /= len(test_loader.dataset)
     print('====> Test set loss: {:.4f}'.format(test_loss))
