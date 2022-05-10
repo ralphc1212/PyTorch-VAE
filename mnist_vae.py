@@ -51,7 +51,7 @@ class VAE(nn.Module):
         return self.decoder(z), mu, log_var
 
 # build model
-vae = VAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=4)
+vae = VAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=16)
 if torch.cuda.is_available():
     vae.cuda()
 
@@ -102,7 +102,7 @@ for epoch in range(1, 51):
     test()
 
 with torch.no_grad():
-    z = torch.randn(64, 4).cuda()
+    z = torch.randn(64, 16).cuda()
     sample = vae.decoder(z).cuda()
 
     save_image(sample.view(64, 1, 28, 28), './mnist_samples/sample_' + '.png')
