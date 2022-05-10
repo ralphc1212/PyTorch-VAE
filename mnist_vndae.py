@@ -37,7 +37,7 @@ class VNDAE(nn.Module):
         self.fc5 = nn.Linear(h_dim2, h_dim1)
         self.fc6 = nn.Linear(h_dim1, x_dim)
 
-        Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
+        Pi = nn.Parameter(PI * torch.ones(z_dim - RSV_DIM), requires_grad=False)
 
         self.ZERO = nn.Parameter(torch.tensor([0.]), requires_grad=False)
         self.ONE = nn.Parameter(torch.tensor([1.]), requires_grad=False)
