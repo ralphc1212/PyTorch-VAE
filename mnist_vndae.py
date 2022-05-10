@@ -7,7 +7,7 @@ from torch.autograd import Variable
 from torchvision.utils import save_image
 
 TAU = 1.
-PI = 0.95
+PI = 0.99
 RSV_DIM = 1
 EPS = 1e-8
 SAMPLE_LEN = 1.
@@ -70,7 +70,7 @@ class VNDAE(nn.Module):
         kld_vnd = torch.diagonal(qv.mm(log_frac.t()), 0).mean()
         kld_loss = kld_vnd + kld_weighted_gaussian
 
-        loss = BCE + 0.05 * kld_loss
+        loss = BCE + 1e-4 * kld_loss
 
         return loss
 
