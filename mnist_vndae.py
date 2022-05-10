@@ -6,7 +6,10 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 from torchvision.utils import save_image
 
+TAU = 1.
+PI = 0.95
 RSV_DIM = 1
+EPS = 1e-8
 SAMPLE_LEN = 1.
 
 bs = 128
@@ -34,13 +37,20 @@ class VNDAE(nn.Module):
         self.fc5 = nn.Linear(h_dim2, h_dim1)
         self.fc6 = nn.Linear(h_dim1, x_dim)
 
+        Pi = nn.Parameter(PI * torch.ones(latent_dim - RSV_DIM), requires_grad=False)
+
+        self.ZERO = nn.Parameter(torch.tensor([0.]), requires_grad=False)
+        self.ONE = nn.Parameter(torch.tensor([1.]), requires_grad=False)
+        self.pv = nn.Parameter(torch.cat([self.ONE, torch.cumprod(Pi, dim=0)])
+                       * torch.cat([1 - Pi, self.ONE]), requires_grad=False)
+
     @staticmethod
     def clip_beta(tensor, to=5.):
         """
         Shrink all tensor's values to range [-to,to]
         """
         return torch.clamp(tensor, -to, to)
-        
+
     def encoder(self, x):
         h = F.relu(self.fc1(x))
         h = F.relu(self.fc2(h))
