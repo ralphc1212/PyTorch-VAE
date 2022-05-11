@@ -114,7 +114,7 @@ vae = VNDAE(x_dim=784, h_dim1= 1024, h_dim2=512, z_dim=LATENT)
 if torch.cuda.is_available():
     vae.cuda()
 
-optimizer = optim.Adam(vae.parameters())
+optimizer = optim.Adam(vae.parameters(), lr=0.001)
 # return reconstruction error + KL divergence losses
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20, 30, 40, 50], gamma=0.1)
 
@@ -159,6 +159,7 @@ BEST = 100
 for epoch in range(1, 51):
     train(epoch)
     te_loss = test()
+    scheduler.step()
     if te_loss < BEST:
         print('...... SAVING CHECKPOINT ......')
         torch.save(vae.state_dict(), 'mnist_model.pt')
