@@ -116,6 +116,7 @@ if torch.cuda.is_available():
 
 optimizer = optim.Adam(vae.parameters())
 # return reconstruction error + KL divergence losses
+scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20, 30, 40, 50], gamma=0.1)
 
 def train(epoch):
     vae.train()
