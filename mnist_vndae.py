@@ -185,9 +185,6 @@ with torch.no_grad():
         #     if len(name) < i+1:
         #         name_set.remove(name)
 
-    print(name_set)
-    exit()
-
     zero = torch.zeros(64, 1).cuda()
 
     for name in name_set:
@@ -198,8 +195,9 @@ with torch.no_grad():
             z_.append(zero.repeat(1, 4 - len(name)))
 
         z_ = torch.cat(z_, dim=1)
+        print(name)
         print(z_.t())
-        exit()
+    exit()
 
     for len_ in range(LATENT):
         l_ = len_ + 1
