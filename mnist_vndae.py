@@ -195,24 +195,26 @@ with torch.no_grad():
             z_.append(zero.repeat(1, 4 - len(name)))
 
         z_ = torch.cat(z_, dim=1)
-        print(name)
-        print(z_.t())
-    exit()
-
-    for len_ in range(LATENT):
-        l_ = len_ + 1
-        z_ = torch.cat([z[:, :l_], torch.zeros_like(z[:, :LATENT - l_])], dim = -1)
 
         sample_1 = vae.decoder(z_).cuda()
+        save_image(sample_1.view(64, 1, 28, 28), './mnist_samples/sample_vnd_'+ name + '.png')
 
-        onehot = torch.nn.functional.one_hot(torch.tensor([len_]), num_classes=LATENT).to(z.device)
 
-        z_ = z * onehot
 
-        sample_2 = vae.decoder(z_).cuda()
+    # for len_ in range(LATENT):
+    #     l_ = len_ + 1
+    #     z_ = torch.cat([z[:, :l_], torch.zeros_like(z[:, :LATENT - l_])], dim = -1)
 
-        save_image(sample_1.view(64, 1, 28, 28), './mnist_samples/sample_vnd_len_'+ str(len_) + '.png')
-        save_image(sample_2.view(64, 1, 28, 28), './mnist_samples/sample_vnd_dim_'+ str(len_) + '.png')
+    #     sample_1 = vae.decoder(z_).cuda()
+
+    #     onehot = torch.nn.functional.one_hot(torch.tensor([len_]), num_classes=LATENT).to(z.device)
+
+    #     z_ = z * onehot
+
+    #     sample_2 = vae.decoder(z_).cuda()
+
+    #     save_image(sample_1.view(64, 1, 28, 28), './mnist_samples/sample_vnd_len_'+ str(len_) + '.png')
+    #     save_image(sample_2.view(64, 1, 28, 28), './mnist_samples/sample_vnd_dim_'+ str(len_) + '.png')
 
 
 
