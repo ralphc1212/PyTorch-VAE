@@ -155,15 +155,15 @@ def test():
     return test_loss
 
 
-# BEST = 100
-# for epoch in range(1, 51):
-#     train(epoch)
-#     te_loss = test()
-#     scheduler.step()
-#     if te_loss < BEST:
-#         print('...... SAVING CHECKPOINT ......')
-#         torch.save(vae.state_dict(), 'mnist_model.pt')
-#         BEST = te_loss
+BEST = 100
+for epoch in range(1, 51):
+    train(epoch)
+    te_loss = test()
+    scheduler.step()
+    if te_loss < BEST:
+        print('...... SAVING CHECKPOINT ......')
+        torch.save(vae.state_dict(), 'mnist_model.pt')
+        BEST = te_loss
 
 vae.load_state_dict(torch.load('mnist_model.pt'))
 
