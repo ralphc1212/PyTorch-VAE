@@ -173,7 +173,7 @@ with torch.no_grad():
     for i, k in enumerate(ks):
         for j, ink in enumerate(k):
             z['{}-{}'.format(str(i), str(j))] = torch.randn(64, 1).cuda()
-    print(z)
+    print(z.keys())
     exit()
     zero = torch.zeros(64, 1).cuda()
 
