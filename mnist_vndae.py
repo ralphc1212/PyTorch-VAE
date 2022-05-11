@@ -151,11 +151,19 @@ def test():
 
     test_loss /= len(test_loader.dataset)
     print('====> Test set loss: {:.4f}'.format(test_loss))
+    return test_loss
 
-for epoch in range(1, 51):
+
+BEST = 100
+for epoch in range(1, 2):
     train(epoch)
-    test()
+    te_loss = test()
+    if te_loss < BEST:
+        torch.save(vae.state_dict(), 'mnist_model.pt')
+        BEST = te_loss
 
+
+vae.load_state_dict(torch.load('mnist_model.pt'))
 
 with torch.no_grad():
     z = torch.randn(64, LATENT).cuda()
