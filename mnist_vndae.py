@@ -177,7 +177,7 @@ with torch.no_grad():
             if i == 0:
                 name_set.add('0')
             else:
-                for name in name_set:
+                for name in name_set.copy():
                     name_set.add(name+str(j))
         for name in name_set.copy():
             if len(name) < i+1:
