@@ -198,7 +198,7 @@ with torch.no_grad():
             z_.append(zero.repeat(1, 4 - len(name)))
 
         z_ = torch.cat(z_, dim=1)
-        print(z_)
+        print(z_.t())
         exit()
 
     for len_ in range(LATENT):
