@@ -165,7 +165,7 @@ def test():
 
 vae.load_state_dict(torch.load('mnist_model.pt'))
 
-torch.seed(63723)
+torch.manual_seed(63723)
 # generate samples
 with torch.no_grad():
     ks = [[0], [0,1], [0,1], [0,1]]
