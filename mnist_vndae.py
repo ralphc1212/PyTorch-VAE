@@ -170,13 +170,27 @@ with torch.no_grad():
     ks = [[0], [0,1], [0,1], [0,1]]
     z = {}
 
+    name_set = set()
     for i, k in enumerate(ks):
         for j, ink in enumerate(k):
             z['{}-{}'.format(str(i), str(j))] = torch.randn(64, 1).cuda()
-    print(z.keys())
+            if i == 0:
+                name_set.add('0')
+            else:
+                for name in name_set:
+                    name_set.add(name+str(j))
+        for name in name_set:
+            if len(name) < i+1:
+                name_set.remove(name)
+
+    print(name_set)
     exit()
+
     zero = torch.zeros(64, 1).cuda()
 
+    for i, k in enumerate(ks):
+
+        for j, ink in enumerate(k):
 
     for len_ in range(LATENT):
         l_ = len_ + 1
