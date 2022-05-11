@@ -172,13 +172,15 @@ with torch.no_grad():
 
     name_set = set()
     for i, k in enumerate(ks):
+        name_set_c = name_set.copy()
         for j, ink in enumerate(k):
             z['{}-{}'.format(str(i), str(j))] = torch.randn(64, 1).cuda()
             if i == 0:
                 name_set.add('0')
             else:
-                for name in name_set.copy():
+                for name in name_set_c:
                     name_set.add(name+str(j))
+
         for name in name_set.copy():
             if len(name) < i+1:
                 name_set.remove(name)
