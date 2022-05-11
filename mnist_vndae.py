@@ -154,19 +154,30 @@ def test():
     return test_loss
 
 
-BEST = 100
-for epoch in range(1, 51):
-    train(epoch)
-    te_loss = test()
-    if te_loss < BEST:
-        print('...... SAVING CHECKPOINT ......')
-        torch.save(vae.state_dict(), 'mnist_model.pt')
-        BEST = te_loss
+# BEST = 100
+# for epoch in range(1, 51):
+#     train(epoch)
+#     te_loss = test()
+#     if te_loss < BEST:
+#         print('...... SAVING CHECKPOINT ......')
+#         torch.save(vae.state_dict(), 'mnist_model.pt')
+#         BEST = te_loss
 
 vae.load_state_dict(torch.load('mnist_model.pt'))
 
+# generate samples
 with torch.no_grad():
-    z = torch.randn(64, LATENT).cuda()
+    ks = [[0], [0,1], [0,1], [0,1]]
+    z = {}
+
+    for i, k in enumerate(ks):
+        for j, ink in enumerate(k):
+            z['{}-{}'.format(str(i), str(j))] = torch.randn(64, 1).cuda()
+    print(z)
+    exit()
+    zero = torch.zeros(64, 1).cuda()
+
+
     for len_ in range(LATENT):
         l_ = len_ + 1
         z_ = torch.cat([z[:, :l_], torch.zeros_like(z[:, :LATENT - l_])], dim = -1)
