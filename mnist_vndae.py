@@ -181,13 +181,13 @@ with torch.no_grad():
                 for name in name_set_c:
                     name_set.add(name+str(j))
 
-        for name in name_set.copy():
-            if len(name) < i+1:
-                name_set.remove(name)
+        # for name in name_set.copy():
+        #     if len(name) < i+1:
+        #         name_set.remove(name)
 
     print(name_set)
     exit()
-
+    
     zero = torch.zeros(64, 1).cuda()
 
     # for i, k in enumerate(ks):
