@@ -188,9 +188,9 @@ with torch.no_grad():
 
     zero = torch.zeros(64, 1).cuda()
 
-    for i, k in enumerate(ks):
+    # for i, k in enumerate(ks):
 
-        for j, ink in enumerate(k):
+    #     for j, ink in enumerate(k):
 
     for len_ in range(LATENT):
         l_ = len_ + 1
