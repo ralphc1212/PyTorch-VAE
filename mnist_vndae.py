@@ -159,6 +159,7 @@ for epoch in range(1, 2):
     train(epoch)
     te_loss = test()
     if te_loss < BEST:
+        print('...... SAVING CHECKPOINT ......')
         torch.save(vae.state_dict(), 'mnist_model.pt')
         BEST = te_loss
 
