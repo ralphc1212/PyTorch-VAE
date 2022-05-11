@@ -110,7 +110,7 @@ class VNDAE(nn.Module):
         return self.decoder(z), mu, log_var, p_vnd 
 
 # build model
-vae = VNDAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=LATENT)
+vae = VNDAE(x_dim=784, h_dim1= 1024, h_dim2=512, z_dim=LATENT)
 if torch.cuda.is_available():
     vae.cuda()
 
@@ -154,14 +154,14 @@ def test():
     return test_loss
 
 
-# BEST = 100
-# for epoch in range(1, 51):
-#     train(epoch)
-#     te_loss = test()
-#     if te_loss < BEST:
-#         print('...... SAVING CHECKPOINT ......')
-#         torch.save(vae.state_dict(), 'mnist_model.pt')
-#         BEST = te_loss
+BEST = 100
+for epoch in range(1, 51):
+    train(epoch)
+    te_loss = test()
+    if te_loss < BEST:
+        print('...... SAVING CHECKPOINT ......')
+        torch.save(vae.state_dict(), 'mnist_model.pt')
+        BEST = te_loss
 
 vae.load_state_dict(torch.load('mnist_model.pt'))
 
