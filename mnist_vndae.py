@@ -179,7 +179,7 @@ with torch.no_grad():
             else:
                 for name in name_set:
                     name_set.add(name+str(j))
-        for name in name_set:
+        for name in name_set.copy():
             if len(name) < i+1:
                 name_set.remove(name)
 
