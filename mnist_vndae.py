@@ -7,14 +7,14 @@ from torch.autograd import Variable
 from torchvision.utils import save_image
 
 TAU = 1.
-PI = 0.99
+PI = 0.8
 RSV_DIM = 1
 EPS = 1e-8
 SAMPLE_LEN = 1.
 
 LATENT = 4
 
-bs = 32
+bs = 64
 # MNIST Dataset
 train_dataset = datasets.MNIST(root='./mnist_data/', train=True, transform=transforms.ToTensor(), download=True)
 test_dataset = datasets.MNIST(root='./mnist_data/', train=False, transform=transforms.ToTensor(), download=False)
@@ -114,7 +114,7 @@ vae = VNDAE(x_dim=784, h_dim1= 512, h_dim2=256, z_dim=LATENT)
 if torch.cuda.is_available():
     vae.cuda()
 
-optimizer = optim.Adam(vae.parameters(), lr=0.01)
+optimizer = optim.Adam(vae.parameters(), lr=0.001)
 # return reconstruction error + KL divergence losses
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20, 30, 40, 50], gamma=0.1)
 
