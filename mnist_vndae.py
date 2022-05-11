@@ -187,12 +187,19 @@ with torch.no_grad():
 
     print(name_set)
     exit()
-    
+
     zero = torch.zeros(64, 1).cuda()
 
-    # for i, k in enumerate(ks):
+    for name in name_set:
+        z_ = []
+        for i, c in enumerate(name):
+            z_.append(z['{}-{}'.format(str(i), str(c))])
+        if len(name) < 4:
+            z_.append(zero.repeat(1, 4 - len(name)))
 
-    #     for j, ink in enumerate(k):
+        z_ = torch.cat(z_, dim=1)
+        print(z_)
+        exit()
 
     for len_ in range(LATENT):
         l_ = len_ + 1
