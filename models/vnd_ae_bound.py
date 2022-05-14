@@ -52,9 +52,6 @@ class VNDAE_BD(BaseVAE):
         self.pv = nn.Parameter(torch.cat([self.ONE, torch.cumprod(Pi, dim=0)])
                        * torch.cat([1 - Pi, self.ONE]), requires_grad=False)
 
-        print(self.pv.shape)
-        exit()
-
         self.beta_bar = 0.005
 
         # Build Decoder
@@ -138,11 +135,9 @@ class VNDAE_BD(BaseVAE):
 
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        # beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
-        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/128))
-        ONES = torch.ones_like(beta[:,0:1])
-        qv = torch.cat([ONES, torch.cumprod(beta, dim=1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
-        s_vnd = F.gumbel_softmax(qv, tau=TAU, hard=True)
+
+        beta = self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/128)
+        s_vnd = F.gumbel_softmax(beta, tau=TAU, hard=True)
 
         cumsum = torch.cumsum(s_vnd, dim=1)
         dif = cumsum - s_vnd
@@ -172,9 +167,7 @@ class VNDAE_BD(BaseVAE):
         mu = args[2]
         log_var = args[3]
         p_vnd = args[4]
-        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
-        ONES = torch.ones_like(beta[:,0:1])
-        qv = torch.cat([ONES, torch.cumprod(beta, dim=1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
+        qv = self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/128)
 
         ZEROS = torch.zeros_like(beta[:, 0:1])
         cum_sum = torch.cat([ZEROS, torch.cumsum(qv[:, 1:], dim = 1)], dim = -1)[:, :-1]
