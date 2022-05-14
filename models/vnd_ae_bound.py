@@ -10,14 +10,17 @@ RSV_DIM = 1
 EPS = 1e-8
 SAMPLE_LEN = 1.
 
-class VNDAE(BaseVAE):
+# 1/128 = 0.0078125
+
+
+class VNDAE_BD(BaseVAE):
 
     def __init__(self,
                  in_channels: int,
                  latent_dim: int,
                  hidden_dims: List = None,
                  **kwargs) -> None:
-        super(VNDAE, self).__init__()
+        super(VNDAE_BD, self).__init__()
 
         self.latent_dim = latent_dim
 
@@ -48,6 +51,11 @@ class VNDAE(BaseVAE):
         self.ONE = nn.Parameter(torch.tensor([1.]), requires_grad=False)
         self.pv = nn.Parameter(torch.cat([self.ONE, torch.cumprod(Pi, dim=0)])
                        * torch.cat([1 - Pi, self.ONE]), requires_grad=False)
+
+        print(self.pv.shape)
+        exit()
+
+        self.beta_bar = 0.005
 
         # Build Decoder
         modules = []
@@ -85,11 +93,8 @@ class VNDAE(BaseVAE):
                             nn.Tanh())
 
     @staticmethod
-    def clip_beta(tensor, to=5.):
-        """
-        Shrink all tensor's values to range [-to,to]
-        """
-        return torch.clamp(tensor, -to, to)
+    def clip_beta(tensor, to1=0., to2=1/128.):
+        return torch.clamp(tensor, to1, to2)
 
     def encode(self, input: Tensor) -> List[Tensor]:
         """
@@ -133,7 +138,8 @@ class VNDAE(BaseVAE):
 
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
+        # beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:]))
+        beta = torch.sigmoid(self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/128))
         ONES = torch.ones_like(beta[:,0:1])
         qv = torch.cat([ONES, torch.cumprod(beta, dim=1)], dim = -1) * torch.cat([1 - beta, ONES], dim = -1)
         s_vnd = F.gumbel_softmax(qv, tau=TAU, hard=True)
