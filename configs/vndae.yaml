@@ -1,5 +1,5 @@
 model_params:
-  name: 'VNDAE_BD'
+  name: 'VNDAE'
   in_channels: 3
   latent_dim: 128
 
@@ -25,5 +25,5 @@ trainer_params:
 
 logging_params:
   save_dir: "logs/"
-  name: "VNDAE_BD"
+  name: "VNDAE"
 
