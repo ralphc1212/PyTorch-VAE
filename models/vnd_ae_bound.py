@@ -136,8 +136,10 @@ class VNDAE_BD(BaseVAE):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
 
-        beta = self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/128)
-        s_vnd = F.gumbel_softmax(beta, tau=TAU, hard=True)
+        beta = self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/127)
+        ONES = torch.ones_like(beta[:,0:1])
+        qv = torch.cat([ONES, beta], dim = -1)
+        s_vnd = F.gumbel_softmax(qv, tau=TAU, hard=True)
 
         cumsum = torch.cumsum(s_vnd, dim=1)
         dif = cumsum - s_vnd
@@ -167,7 +169,10 @@ class VNDAE_BD(BaseVAE):
         mu = args[2]
         log_var = args[3]
         p_vnd = args[4]
-        qv = self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/128)
+
+        beta = self.clip_beta(p_vnd[:,RSV_DIM:] + self.beta_bar, 0, 1/127)
+        ONES = torch.ones_like(beta[:,0:1])
+        qv = torch.cat([ONES, beta], dim = -1)
 
         ZEROS = torch.zeros_like(beta[:, 0:1])
         cum_sum = torch.cat([ZEROS, torch.cumsum(qv[:, 1:], dim = 1)], dim = -1)[:, :-1]
