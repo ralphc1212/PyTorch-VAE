@@ -23,7 +23,7 @@ from .vnd_vq_vae import *
 from .betatc_vae import *
 from .dip_vae import *
 from .vnd_ae import *
-from .vnd_ae import *
+from .vnd_ae_bound import *
 from .vnd_ae_attn import *
 from .odo_vae import *
 from .resnet50_vae import *
