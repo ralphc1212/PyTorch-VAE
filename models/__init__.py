@@ -57,6 +57,7 @@ vae_models = {'HVAE':HVAE,
               'ConditionalVAE':ConditionalVAE,
               'CategoricalVAE':CategoricalVAE,
               'VNDAE':VNDAE,
+              'VNDAE_BD':VNDAE_BD,
               'VNDVQVAE':VNDVQVAE,
               'VNDAE_ATTN':VNDAE_ATTN,
               'ODOVAE':ODOVAE}
