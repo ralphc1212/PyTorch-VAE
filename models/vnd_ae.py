@@ -199,13 +199,29 @@ class VNDAE(BaseVAE):
         :param current_device: (Int) Device to run the model
         :return: (Tensor)
         """
+
+        ### sample with specified length ###
+        # z = torch.randn(num_samples,
+        #                 self.latent_dim)
+
+        # z = torch.cat([z[:, :int(SAMPLE_LEN * self.latent_dim)], torch.zeros_like(z[:, :int((1 - SAMPLE_LEN) * self.latent_dim)])], dim = -1)
+        # z = z.to(current_device)
+
+        # samples = self.decode(z)
+
+        ### sample with mixed lengths ###
         z = torch.randn(num_samples,
                         self.latent_dim)
 
-        z = torch.cat([z[:, :int(SAMPLE_LEN * self.latent_dim)], torch.zeros_like(z[:, :int((1 - SAMPLE_LEN) * self.latent_dim)])], dim = -1)
+        cat_var = torch.distributions.categorical.Categorical(torch.tensor([1./127]*127))
+        m = cat_var.sample()
+
+        z = torch.cat([z[:, : 1 + m], torch.zeros_like(z[:, : 127 - m])], dim = -1)
+
         z = z.to(current_device)
 
         samples = self.decode(z)
+        
         return samples
 
     def generate(self, x: Tensor, **kwargs) -> Tensor:
